@@ -1,0 +1,9 @@
+name = "smarm"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-06-24"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "SMARM_DB"
+database_name = "smarm-db"
+database_id = "ec06901b-9b5f-450d-86a7-11a562c2a015"

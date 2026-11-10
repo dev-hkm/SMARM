@@ -1,0 +1,17 @@
+node_modules/
+build/
+dist/
+cf-pages-upload/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+.dev.vars
+.workbuddy-ai/
+.wrangler/
+tmp/
+test_flow.js
+test_gas.cjs
+test_gas.js
+tmp_test_stream.js
