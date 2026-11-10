@@ -193,13 +193,13 @@ export default function Dashboard() {
       {/* Brutalist Bottom Navigation */}
       <AnimatePresence>
         {activeTab !== 'chat' && (
-          <motion.div 
+          <motion.div
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-6 left-0 right-0 flex justify-center z-50 px-4 pointer-events-none"
+            className="fixed bottom-0 left-0 right-0 z-50 md:bottom-6 md:flex md:justify-center md:px-4 pointer-events-none"
           >
-            <div className="bg-white p-2 border-[4px] border-black shadow-[6px_6px_0_#000] flex items-center space-x-2 max-w-[95vw] md:max-w-none pointer-events-auto overflow-x-auto no-scrollbar">
+            <div className="pointer-events-auto w-full md:w-auto bg-white border-t-[4px] md:border-[4px] border-black md:shadow-[6px_6px_0_#000] grid grid-cols-7 md:flex md:items-center md:gap-2 px-1 pb-[env(safe-area-inset-bottom)] md:p-2">
               {tabs.map((tab) => {
                 const isActive = activeTab === tab.id;
                 const Icon = tab.icon;
@@ -207,23 +207,28 @@ export default function Dashboard() {
                   <button
                     key={tab.id}
                     onClick={() => handleTabChange(tab.id)}
-                    className={`relative flex items-center justify-center px-4 py-3 md:px-6 md:py-4 transition-all duration-200 border-[3px] border-transparent uppercase whitespace-nowrap ${
-                      isActive 
-                        ? 'text-black font-black' 
-                        : 'text-black font-bold hover:bg-black hover:text-white hover:border-black'
+                    aria-label={tab.label}
+                    aria-current={isActive ? 'page' : undefined}
+                    title={tab.label}
+                    className={`relative flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-0.5 py-2 md:px-6 md:py-4 transition-all duration-200 border-[3px] border-transparent uppercase min-w-0 ${
+                      isActive
+                        ? 'text-black font-black'
+                        : 'text-black/70 font-bold hover:bg-black hover:text-white hover:border-black'
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="activeTabBrutal"
-                        className={`absolute inset-0 border-[3px] border-black shadow-[4px_4px_0_#000] ${getTabColor(tab.id)}`}
+                        className={`absolute inset-0 border-[3px] border-black md:shadow-[4px_4px_0_#000] ${getTabColor(tab.id)}`}
                         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         style={{ zIndex: 0 }}
                       />
                     )}
-                    <span className="relative z-10 flex items-center text-xs md:text-sm tracking-wide">
-                      <Icon className={`w-5 h-5 stroke-[3px] ${isActive ? 'mr-2' : ''}`} />
-                      {isActive && <span>{tab.label}</span>}
+                    <span className="relative z-10 flex flex-col md:flex-row items-center gap-0.5 md:gap-2 min-w-0">
+                      <Icon className="w-5 h-5 flex-shrink-0 stroke-[3px]" />
+                      <span className="text-[9px] md:text-sm leading-none tracking-tight md:tracking-wide truncate max-w-full">
+                        {tab.label}
+                      </span>
                     </span>
                   </button>
                 );

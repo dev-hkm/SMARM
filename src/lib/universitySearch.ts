@@ -3,6 +3,8 @@ export type ConstraintStatus = "not_applicable" | "meets" | "unknown" | "conflic
 export type UniversityCandidate = {
   title: string;
   url: string;
+  /** Short factual overview of the school, shown on the selection card. */
+  description: string;
   highlights: string[];
   matchedMajors: string[];
   constraintStatus: ConstraintStatus;
@@ -31,6 +33,7 @@ type StructuredUniversity = {
   title?: unknown;
   url?: unknown;
   evidence?: unknown;
+  description?: unknown;
   constraintStatus?: unknown;
   constraintReason?: unknown;
 };
@@ -258,6 +261,114 @@ const GENERIC_PAGE_TITLES = [
   "chuong trinh dao tao",
   "thong tin chung",
 ];
+
+// Curated one-paragraph overviews for the schools students pick most often.
+// They keep the selection cards readable even when the search provider returns
+// no usable summary; unknown schools fall back to the provider description.
+const UNIVERSITY_DESCRIPTIONS: Record<string, string> = {
+  "Đại học Bách khoa Hà Nội":
+    "Trường đại học công lập hàng đầu về kỹ thuật – công nghệ ở miền Bắc, trực thuộc Bộ Giáo dục và Đào tạo. Thế mạnh ở cơ khí, điện – điện tử, tự động hóa, công nghệ thông tin và vật liệu; điểm chuẩn thường thuộc nhóm cao nhất cả nước.",
+  "Trường Đại học Bách khoa TP.HCM":
+    "Trường công lập trực thuộc ĐHQG TP.HCM, cơ sở chính tại TP Thủ Đức. Mạnh về kỹ thuật – công nghệ, cơ khí, điện – điện tử, xây dựng và công nghệ thông tin.",
+  "Trường Đại học Bách khoa - Đại học Đà Nẵng":
+    "Trường công lập trực thuộc Đại học Đà Nẵng, là trung tâm đào tạo kỹ thuật – công nghệ lớn của miền Trung. Thế mạnh về cơ khí, điện, xây dựng, công nghệ thông tin và môi trường.",
+  "Trường Đại học Công nghệ - ĐHQGHN":
+    "Trường công lập trực thuộc ĐHQG Hà Nội, chuyên sâu về công nghệ thông tin, kỹ thuật phần mềm, khoa học máy tính và công nghệ kỹ thuật.",
+  "Trường Đại học Công nghệ Thông tin - ĐHQG-HCM":
+    "Trường công lập trực thuộc ĐHQG TP.HCM, chuyên đào tạo công nghệ thông tin, kỹ thuật phần mềm, khoa học máy tính và hệ thống thông tin. Là một trong những trường CNTT lớn nhất phía Nam.",
+  "Trường Đại học Khoa học Tự nhiên - ĐHQG-HCM":
+    "Trường công lập trực thuộc ĐHQG TP.HCM, mạnh về khoa học tự nhiên, toán – tin, vật lý, hóa học và sinh học. Có nhiều chương trình đào tạo và nghiên cứu cơ bản.",
+  "Trường Đại học Quốc tế - ĐHQG-HCM":
+    "Trường quốc tế công lập trực thuộc ĐHQG TP.HCM, giảng dạy bằng tiếng Anh theo mô hình quốc tế. Mạnh về kỹ thuật, công nghệ thông tin, kinh tế và ngôn ngữ.",
+  "Trường Đại học Kinh tế - Luật - ĐHQG-HCM":
+    "Trường công lập trực thuộc ĐHQG TP.HCM, đào tạo về kinh tế, luật, tài chính – ngân hàng và quản trị kinh doanh. Có thế mạnh ở các ngành luật kinh tế và kinh doanh quốc tế.",
+  "Trường Đại học Khoa học Xã hội và Nhân văn - ĐHQGHN":
+    "Trường công lập trực thuộc ĐHQG Hà Nội, đào tạo khoa học xã hội và nhân văn: báo chí, ngôn ngữ, lịch sử, tâm lý và xã hội học.",
+  "Trường Đại học Y Dược - Đại học Quốc gia Hà Nội":
+    "Trường đại học y dược công lập trực thuộc ĐHQG Hà Nội, đào tạo bác sĩ, dược sĩ và các ngành khoa học sức khỏe, gắn với bệnh viện thực hành.",
+  "Đại học Quốc gia Hà Nội":
+    "Hệ thống đại học công lập lớn tại Hà Nội, gồm nhiều trường thành viên chuyên về khoa học tự nhiên, khoa học xã hội, công nghệ và kinh tế.",
+  "Đại học Quốc gia TP.HCM":
+    "Hệ thống đại học công lập lớn phía Nam, gồm nhiều trường thành viên về kỹ thuật, công nghệ, kinh tế, khoa học tự nhiên và nhân văn.",
+  "Trường Đại học Kinh tế Quốc dân":
+    "Trường đại học công lập hàng đầu về kinh tế ở miền Bắc, mạnh về kinh tế, quản trị kinh doanh, tài chính – ngân hàng và kế toán.",
+  "Trường Đại học Ngoại thương":
+    "Trường công lập chuyên sâu về ngoại thương, kinh tế quốc tế, kinh doanh quốc tế và tài chính quốc tế, có cơ sở tại Hà Nội và TP.HCM.",
+  "Học viện Ngân hàng":
+    "Học viện công lập trực thuộc Ngân hàng Nhà nước, đào tạo tài chính – ngân hàng, kế toán và quản trị kinh doanh.",
+  "Học viện Tài chính":
+    "Học viện công lập chuyên về tài chính, kế toán, ngân hàng, thuế và kinh tế, trực thuộc Bộ Tài chính.",
+  "Học viện Ngoại giao":
+    "Học viện công lập trực thuộc Bộ Ngoại giao, đào tạo quan hệ quốc tế, ngoại ngữ, luật quốc tế và kinh tế quốc tế.",
+  "Học viện Báo chí và Tuyên truyền":
+    "Học viện công lập đào tạo báo chí, truyền thông, xuất bản và tuyên truyền, trực thuộc Học viện Chính trị Quốc gia Hồ Chí Minh.",
+  "Học viện Nông nghiệp Việt Nam":
+    "Học viện công lập mạnh về nông nghiệp, thú y, công nghệ sinh học, môi trường và kinh tế nông nghiệp.",
+  "Học viện Kỹ thuật Quân sự":
+    "Học viện trực thuộc Bộ Quốc phòng, đào tạo kỹ thuật, công nghệ thông tin và chỉ huy tham mưu; tuyển sinh theo quy định riêng.",
+  "Học viện Công nghệ Bưu chính Viễn thông":
+    "Học viện công lập trực thuộc Bộ Thông tin và Truyền thông, mạnh về viễn thông, công nghệ thông tin, điện tử và an toàn thông tin, có cơ sở tại Hà Nội và TP.HCM.",
+  "Học viện Kỹ thuật Mật mã":
+    "Học viện đào tạo công nghệ thông tin, an toàn thông tin và mật mã thuộc ngành cơ yếu; tuyển sinh theo quy định riêng.",
+  "Trường Đại học Công nghệ TP.HCM":
+    "Trường tư thục tại TP.HCM, đào tạo đa ngành về kỹ thuật, công nghệ thông tin, kinh tế, kiến trúc và luật.",
+  "Trường Đại học Sư phạm Kỹ thuật TP.HCM":
+    "Trường công lập mạnh về sư phạm kỹ thuật, kỹ thuật công nghệ và giáo dục nghề nghiệp, trực thuộc Bộ Giáo dục và Đào tạo.",
+  "Trường Đại học Sư phạm Hà Nội":
+    "Trường công lập hàng đầu đào tạo giáo viên các cấp, mạnh về khoa học giáo dục và các khoa học cơ bản.",
+  "Trường Đại học Sư phạm TP.HCM":
+    "Trường công lập đào tạo giáo viên và các ngành sư phạm tại TP.HCM, gồm cả khoa học cơ bản và khoa học giáo dục.",
+  "Trường Đại học Xây dựng Hà Nội":
+    "Trường công lập chuyên về xây dựng, kiến trúc, hạ tầng và kỹ thuật môi trường tại Hà Nội.",
+  "Trường Đại học Kiến trúc Hà Nội":
+    "Trường công lập chuyên đào tạo kiến trúc, quy hoạch, xây dựng và thiết kế tại Hà Nội.",
+  "Trường Đại học Kiến trúc TP.HCM":
+    "Trường công lập chuyên về kiến trúc, quy hoạch đô thị và thiết kế tại TP.HCM.",
+  "Trường Đại học Y Hà Nội":
+    "Trường đại học y khoa công lập lâu đời tại Hà Nội, đào tạo bác sĩ, răng hàm mặt, y tế công cộng và các ngành y sinh.",
+  "Trường Đại học Y Dược TP.HCM":
+    "Trường đại học y dược công lập lớn nhất phía Nam, đào tạo bác sĩ, dược sĩ và các chuyên ngành khoa học sức khỏe.",
+  "Trường Đại học Kinh tế TP.HCM":
+    "Trường công lập trọng điểm về kinh tế, kinh doanh, tài chính và luật kinh tế tại TP.HCM.",
+  "Trường Đại học Luật Hà Nội":
+    "Trường công lập chuyên về luật và các ngành liên quan, trực thuộc Bộ Giáo dục và Đào tạo.",
+  "Trường Đại học Luật TP.HCM":
+    "Trường công lập chuyên đào tạo luật và các ngành liên quan tại TP.HCM.",
+  "Trường Đại học Tôn Đức Thắng":
+    "Trường tư thục tại TP.HCM, đào tạo đa ngành về kỹ thuật, công nghệ, kinh tế, tài chính và ngôn ngữ.",
+  "Trường Đại học Văn Lang":
+    "Trường tư thục tại TP.HCM, đào tạo đa ngành về kỹ thuật, kinh tế, thiết kế, truyền thông và khoa học sức khỏe.",
+  "Trường Đại học Hoa Sen":
+    "Trường tư thục tại TP.HCM, chú trọng kinh tế, du lịch, thiết kế, công nghệ thông tin và ngôn ngữ.",
+  "Trường Đại học Mở TP.HCM":
+    "Trường công lập đào tạo đa ngành theo mô hình mở, mạnh về kinh tế, công nghệ thông tin, luật và xây dựng.",
+  "Trường Đại học Mở Hà Nội":
+    "Trường công lập tại Hà Nội đào tạo đa ngành về kinh tế, công nghệ, luật, du lịch và ngôn ngữ.",
+  "Trường Đại học Hà Nội":
+    "Trường công lập chuyên về ngoại ngữ, ngôn ngữ học, quốc tế học và đào tạo giáo viên ngoại ngữ.",
+  "Trường Đại học Sài Gòn":
+    "Trường công lập tại TP.HCM đào tạo đa ngành về sư phạm, kinh tế, kỹ thuật, công nghệ và khoa học xã hội.",
+  "Trường Đại học Nguyễn Tất Thành":
+    "Trường tư thục tại TP.HCM, đào tạo đa ngành về y dược, kỹ thuật, kinh tế, luật và du lịch.",
+  "Trường Đại học Phenikaa":
+    "Trường tư thục tại Hà Nội, mạnh về kỹ thuật, công nghệ, khoa học sức khỏe và kinh tế.",
+  "Trường Đại học VinUni":
+    "Trường tư thục phi lợi nhuận tại Hà Nội, đào tạo theo chuẩn quốc tế về y, kỹ thuật, kinh doanh và khoa học máy tính.",
+  "Trường Đại học FPT":
+    "Trường tư thục trực thuộc Tập đoàn FPT, mạnh về công nghệ thông tin, trí tuệ nhân tạo, kinh doanh và ngôn ngữ; có cơ sở ở nhiều tỉnh thành.",
+  "Đại học RMIT Việt Nam":
+    "Đại học quốc tế có cơ sở tại Hà Nội và TP.HCM, giảng dạy bằng tiếng Anh, mạnh về kinh doanh, công nghệ, thiết kế và truyền thông.",
+  "Trường Đại học Duy Tân":
+    "Trường tư thục tại Đà Nẵng, đào tạo đa ngành về kỹ thuật, công nghệ thông tin, kinh tế, y dược và du lịch.",
+  "Trường Đại học Cần Thơ":
+    "Trường công lập lớn nhất Đồng bằng sông Cửu Long, mạnh về nông nghiệp, thủy sản, môi trường, kỹ thuật và kinh tế.",
+  "Trường Đại học Vinh":
+    "Trường công lập tại Nghệ An, đào tạo đa ngành về sư phạm, kỹ thuật, kinh tế, nông lâm và y dược.",
+  "Trường Đại học Quy Nhơn":
+    "Trường công lập tại Bình Định đào tạo đa ngành về sư phạm, kỹ thuật, kinh tế và khoa học.",
+  "Trường Đại học Ngoại ngữ - Tin học TP.HCM":
+    "Trường tư thục chuyên về ngoại ngữ và tin học, đào tạo ngôn ngữ, công nghệ thông tin, kinh doanh và du lịch.",
+};
 
 function toSearchableText(text: string) {
   return text
@@ -581,6 +692,37 @@ function cleanEvidence(text: string, title: string): string {
   return clean.slice(0, 260);
 }
 
+const DESCRIPTION_MAX_LENGTH = 260;
+
+function cleanDescription(text: string, universityName: string) {
+  const clean = text
+    .replace(/https?:\/\/\S+/giu, " ")
+    .replace(/[*_#>`]+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/^[\s"“”'|:;,.\-–—]+/u, "")
+    .replace(/[\s"“”'|:;,.\-–—]+$/u, "")
+    .trim();
+  if (clean.length < 40) return "";
+  // Provider summaries are sometimes admissions blurbs or raw English page text.
+  if (/^(tóm tắt|summary|trang thông tin|thông tin tuyển sinh|cổng thông tin|admissions)/iu.test(clean)) {
+    return "";
+  }
+  if (!/[àáảãạăằắẳẵặâầấẩẫậđêềếểễệôồốổỗộơờớởỡợưừứửữựìíỉĩịòóỏõọùúủũụỳýỷỹỵ]/iu.test(clean)) {
+    return "";
+  }
+  const normalized = normalizeTitle(clean);
+  if (!normalized || normalized === normalizeTitle(universityName)) return "";
+  if (GENERIC_PAGE_TITLES.some((marker) => normalized === normalizeTitle(marker))) return "";
+  if (clean.length <= DESCRIPTION_MAX_LENGTH) return clean;
+  const cut = clean.slice(0, DESCRIPTION_MAX_LENGTH);
+  const lastStop = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("; "), cut.lastIndexOf(", "));
+  return lastStop > 120 ? cut.slice(0, lastStop + 1).trim() : `${cut.trimEnd()}…`;
+}
+
+function curatedDescription(universityName: string) {
+  return UNIVERSITY_DESCRIPTIONS[universityName] || "";
+}
+
 // Search models sometimes attach evidence that opens with a different school's
 // name (e.g. a PTIT paragraph filed under Xây dựng Hà Nội). Such quotes are
 // worse than no quote at all.
@@ -632,6 +774,9 @@ function buildCandidatesFromStructured(
       return {
         title: resolved.name,
         url: resolved.url,
+        description:
+          curatedDescription(resolved.name) ||
+          cleanDescription(asText(item.description, 600), resolved.name),
         highlights: evidence ? [evidence] : [],
         matchedMajors: [topicLabel],
         constraintStatus: normalizeConstraintStatus(item.constraintStatus, hasConstraint),
@@ -660,6 +805,10 @@ function buildCandidatesFromResults(
       return {
         title: resolved.name,
         url: resolved.url,
+        description:
+          curatedDescription(resolved.name) ||
+          cleanDescription(asText(result.summary, 600), resolved.name) ||
+          cleanDescription(asText(result.snippet, 600), resolved.name),
         highlights: evidence,
         matchedMajors: [topicLabel],
         constraintStatus: hasConstraint ? "unknown" : "not_applicable",
@@ -716,6 +865,10 @@ export function mergeUniversityCandidates(candidates: UniversityCandidate[]) {
       ...current,
       title,
       url: current.url,
+      description:
+        candidate.description.length > current.description.length
+          ? candidate.description
+          : current.description,
       highlights: uniqueStrings([...current.highlights, ...candidate.highlights]).slice(0, 3),
       matchedMajors: uniqueStrings([...current.matchedMajors, ...candidate.matchedMajors]),
       constraintStatus: pickConstraintStatus(current.constraintStatus, candidate.constraintStatus),
@@ -797,6 +950,7 @@ export function buildUniversitySearchRequest(
         `Gắn nhãn kết quả chung là "${topicLabel}".`,
         "Với mỗi trường, title phải là tên chính thức của trường (ví dụ: Trường Đại học Bách khoa Hà Nội), không được là tiêu đề bài báo hay tên trang web trung gian.",
         "url phải là tên miền chính thức của chính trường đó (ví dụ: https://hust.edu.vn), không trỏ sang trang tổng hợp, trang hướng nghiệp, PDF, LMS hay bài tin tức.",
+        "Với mỗi trường, description là 2-3 câu tiếng Việt mô tả tổng quan: loại hình (công lập/tư thục), khu vực, thế mạnh đào tạo nổi bật và đặc điểm đáng chú ý. Chỉ nêu thông tin có trong nguồn, không suy đoán, không quảng cáo, không lặp lại tên trường ở đầu câu.",
         "Ưu tiên trang chủ trường, trang tuyển sinh chính thức và cổng thông tin đào tạo của trường.",
         "Loại bỏ bài tổng hợp, toplist, review, hướng dẫn và trang trung gian không phải của trường.",
         constraint
@@ -815,10 +969,22 @@ export function buildUniversitySearchRequest(
                 title: { type: "string", description: "Tên chính thức đầy đủ của trường đại học" },
                 url: { type: "string", description: "URL trang chủ chính thức của trường" },
                 evidence: { type: "string", description: "Bằng chứng trường có đào tạo ngành này" },
+                description: {
+                  type: "string",
+                  description:
+                    "2-3 câu tiếng Việt mô tả tổng quan về trường: loại hình, khu vực, thế mạnh đào tạo nổi bật",
+                },
                 constraintStatus: { type: "string" },
                 constraintReason: { type: "string" },
               },
-              required: ["title", "url", "evidence", "constraintStatus", "constraintReason"],
+              required: [
+                "title",
+                "url",
+                "evidence",
+                "description",
+                "constraintStatus",
+                "constraintReason",
+              ],
             },
           },
         },

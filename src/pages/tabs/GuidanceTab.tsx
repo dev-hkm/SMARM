@@ -322,7 +322,7 @@ const withTimeout = <T,>(promise: Promise<T>, ms: number, label: string): Promis
 };
 
 const GUIDANCE_STORAGE_KEY = "smarm_guidance_results";
-const GUIDANCE_RESULTS_VERSION = 2;
+const GUIDANCE_RESULTS_VERSION = 3;
 
 const saveGuidanceResults = (data: {
   selectedCareers: string[];
@@ -364,6 +364,33 @@ interface GuidanceTabProps {
   onComplete?: () => void;
 }
 
+const GUIDANCE_CAREERS_KEY = "smarm_guidance_careers";
+const CAREER_RESULT_LIMIT = 24;
+// Rank of the Holland group decides how many careers it contributes.
+const CAREER_RESULT_WEIGHTS = [12, 8, 4];
+
+const pickRecommendedCareers = (top3: Array<{ category: string }>) => {
+  const buckets = top3.map((item, index) =>
+    (careerGroups[item.category] || []).slice(0, CAREER_RESULT_WEIGHTS[index] ?? 0),
+  );
+  const picked: string[] = [];
+  const seen = new Set<string>();
+  const push = (career?: string) => {
+    if (!career || seen.has(career) || picked.length >= CAREER_RESULT_LIMIT) return;
+    seen.add(career);
+    picked.push(career);
+  };
+  const longest = Math.max(0, ...buckets.map((bucket) => bucket.length));
+  for (let round = 0; round < longest; round += 1) {
+    for (const bucket of buckets) push(bucket[round]);
+  }
+  // Careers repeated across groups can leave the list short; top up by rank.
+  for (const item of top3) {
+    for (const career of careerGroups[item.category] || []) push(career);
+  }
+  return picked;
+};
+
 export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
   const { showToast } = useToast();
 
@@ -389,7 +416,17 @@ export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
     setStep(newStep);
   };
 
-  const [selectedCareers, setSelectedCareers] = useState<string[]>([]);
+  const [selectedCareers, setSelectedCareers] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem(GUIDANCE_CAREERS_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return Array.isArray(parsed)
+        ? parsed.filter((career): career is string => typeof career === "string").slice(0, 5)
+        : [];
+    } catch {
+      return [];
+    }
+  });
   const [universities, setUniversities] = useState<any[]>([]);
   const [selectedUnis, setSelectedUnis] = useState<any[]>([]);
   const [uniDetails, setUniDetails] = useState<any[]>([]);
@@ -447,6 +484,12 @@ export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
     }
   }, []);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(GUIDANCE_CAREERS_KEY, JSON.stringify(selectedCareers));
+    } catch { /* ignore quota errors */ }
+  }, [selectedCareers]);
+
   const results = useMemo(() => {
     if (Object.keys(answers).length === 0) return null;
 
@@ -467,18 +510,7 @@ export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
     const top3 = sortedScores.slice(0, 3);
     const hollandCode = top3.map((item) => item.category).join("");
 
-    let recommendedCareers: string[] = [];
-    top3.forEach((item) => {
-      recommendedCareers = [
-        ...recommendedCareers,
-        ...(careerGroups[item.category] || []),
-      ];
-    });
-
-    recommendedCareers = Array.from(new Set(recommendedCareers));
-    recommendedCareers = recommendedCareers
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 24);
+    const recommendedCareers = pickRecommendedCareers(top3);
 
     return { scores: sortedScores, top3, hollandCode, recommendedCareers };
   }, [answers]);
@@ -1016,6 +1048,7 @@ Yêu cầu:
   const handleReset = () => {
     clearGuidanceResults();
     localStorage.removeItem("smarm_aspirations");
+    localStorage.removeItem(GUIDANCE_CAREERS_KEY);
     setSelectedCareers([]);
     setUniversities([]);
     setSelectedUnis([]);
@@ -1036,7 +1069,7 @@ Yêu cầu:
             exit={{ opacity: 0, x: -20 }}
             className="brutal-card bg-[var(--color-background)] mb-12"
           >
-            <div className="bg-orange-pop p-10 md:p-16 text-center border-b-[4px] border-black relative overflow-hidden flex flex-col items-center">
+            <div className="bg-orange-pop p-6 md:p-16 text-center border-b-[4px] border-black relative overflow-hidden flex flex-col items-center">
               <div className="w-20 h-20 bg-white border-[4px] border-black flex items-center justify-center mb-6 shadow-[6px_6px_0_#000]">
                 <Sparkles className="w-10 h-10 text-black stroke-[3px]" />
               </div>
@@ -1280,6 +1313,12 @@ Yêu cầu:
                   const isSelected = selectedUnis.some(
                     (u) => u.url === uni.url,
                   );
+                  const description =
+                    typeof uni.description === "string" && uni.description.trim()
+                      ? uni.description.trim()
+                      : uni.matchedMajors?.length > 0
+                        ? `Trường đại học có đào tạo ${uni.matchedMajors.slice(0, 2).join(", ")}.`
+                        : "Trường đại học tại Việt Nam; thông tin chi tiết sẽ được tổng hợp ở bước tiếp theo.";
                   return (
                     <div
                       key={index}
@@ -1296,9 +1335,12 @@ Yêu cầu:
                         {isSelected && <Check className="w-6 h-6 stroke-[4px] text-black" />}
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-black text-xl text-black mb-2 uppercase tracking-tight">
+                        <h3 className="font-black text-lg md:text-xl text-black mb-2 uppercase tracking-tight">
                           {uni.title || "Trang web trường đại học"}
                         </h3>
+                        <p className="text-sm font-bold text-black/80 leading-relaxed mb-3">
+                          {description}
+                        </p>
                         <div className="flex flex-wrap gap-2 mb-3">
                           {uni.matchedMajors?.length > 0 && (
                             <span className="text-[11px] font-black uppercase bg-yellow-200 px-2 py-1 border-[2px] border-black shadow-[2px_2px_0_#000]">
