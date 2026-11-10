@@ -15,3 +15,6 @@ test_flow.js
 test_gas.cjs
 test_gas.js
 tmp_test_stream.js
+
+# Tài liệu ghi chú cá nhân, không thuộc mã nguồn
+Hướng dẫn chuẩn, thực chiến về Cloudflare Pages Functions cho backend nhỏ.md

@@ -391,6 +391,46 @@ const pickRecommendedCareers = (top3: Array<{ category: string }>) => {
   return picked;
 };
 
+const buildFallbackDetail = (uni: any) => {
+  const majors = Array.isArray(uni?.matchedMajors)
+    ? uni.matchedMajors.slice(0, 3).join(", ")
+    : "";
+  const summary = [
+    `## ${uni?.title || "Trường đại học"}`,
+    typeof uni?.description === "string" && uni.description.trim()
+      ? uni.description.trim()
+      : "Trường đại học tại Việt Nam.",
+    majors ? `**Ngành liên quan:** ${majors}` : "",
+    "> Chưa truy xuất được nguồn tuyển sinh trực tuyến cho trường này. Hãy mở website chính thức của trường để kiểm tra điểm chuẩn và học phí mới nhất.",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+  return {
+    uni,
+    summary,
+    targetScore: 0,
+    method: "THPT",
+    targetSubjects: [] as string[],
+  };
+};
+
+const HIGHLIGHT_MAX_LENGTH = 170;
+const formatHighlight = (text: string): string => {
+  const clean = String(text)
+    .replace(/\s+/g, " ")
+    .replace(/^[.\u2026\s]+|[.\u2026\s]+$/g, "")
+    .trim();
+  if (clean.length <= HIGHLIGHT_MAX_LENGTH) return clean;
+  const cut = clean.slice(0, HIGHLIGHT_MAX_LENGTH);
+  const stop = Math.max(
+    cut.lastIndexOf(". "),
+    cut.lastIndexOf("; "),
+    cut.lastIndexOf(" - "),
+  );
+  const body = stop > 100 ? cut.slice(0, stop) : cut;
+  return `${body.trim().replace(/[.,;:\-\u2013\u2014]$/, "")}...`;
+};
+
 export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
   const { showToast } = useToast();
 
@@ -950,10 +990,10 @@ Yêu cầu:
             targetSubjects: subjectsArr,
           };
         }
-        return null;
+        return buildFallbackDetail(uni);
         } catch (error) {
           console.error(`Lỗi khi xử lý trường ${uni.title}:`, error);
-          return null;
+          return buildFallbackDetail(uni);
         }
       };
 
@@ -1373,8 +1413,15 @@ Yêu cầu:
                           {uni.url} <ExternalLink className="w-4 h-4 ml-2 stroke-[3px]" />
                         </a>
                         {uni.highlights && uni.highlights.length > 0 && (
-                          <p className="text-sm font-bold text-black/90 line-clamp-2 border-l-[4px] border-black pl-4 bg-white/50 py-2">
-                            "...{uni.highlights[0]}..."
+                          <p
+                            className="text-sm font-bold text-black/90 border-l-[4px] border-black pl-4 bg-white/50 py-2 overflow-hidden"
+                            style={{
+                              display: "-webkit-box",
+                              WebkitBoxOrient: "vertical",
+                              WebkitLineClamp: 2,
+                            }}
+                          >
+                            "...{formatHighlight(uni.highlights[0])}"
                           </p>
                         )}
                       </div>
