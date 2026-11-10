@@ -1,0 +1,49 @@
+{
+  "name": "SMARM — Định hướng nghề nghiệp và tuyển sinh",
+  "short_name": "SMARM",
+  "description": "Trắc nghiệm Holland, gợi ý nghề nghiệp, tìm trường đại học và lập lộ trình học tập cho học sinh Việt Nam.",
+  "lang": "vi",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#FFFBDF",
+  "theme_color": "#FFDE47",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Làm test Holland",
+      "short_name": "Test Holland",
+      "url": "/test",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Bảng điều khiển",
+      "short_name": "Bảng điều khiển",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
