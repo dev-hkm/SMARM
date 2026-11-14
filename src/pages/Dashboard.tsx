@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, MessageSquare, Settings, Calendar, Globe, Compass, GitCompare } from 'lucide-react';
-import { api } from '../lib/api';
+import { ensureSessionUser, readStoredUser, USER_KEY } from '../lib/userSession';
 import LearningTab from './tabs/LearningTab';
 import PlannerTab from './tabs/PlannerTab';
 import ChatTab from './tabs/ChatTab';
@@ -21,20 +21,46 @@ export default function Dashboard() {
       return;
     }
     let active = true;
-    // Cookie có thể hết hạn dù localStorage còn dữ liệu cũ.
-    void api.session()
-      .then((session) => {
-        if (!active || session?.user) return;
-        if (session?.httpStatus === 401) {
-          localStorage.removeItem('smarm_user');
-          navigate('/auth', { replace: true });
-        }
-      })
-      .catch(() => {});
+    // Cookie có thể hết hạn hoặc thuộc tài khoản khác dù localStorage còn dữ liệu cũ.
+    void ensureSessionUser().then((result) => {
+      if (!active) return;
+      if (result === 'unauthenticated') {
+        navigate('/auth', { replace: true });
+        return;
+      }
+      if (result === 'switched') {
+        window.location.reload();
+      }
+    });
     return () => {
       active = false;
     };
   }, [hasUser, navigate]);
+
+  // Another tab may log out or sign in as a different account while this one stays open.
+  useEffect(() => {
+    const parseUserId = (value: string | null) => {
+      if (!value) return '';
+      try {
+        const parsed = JSON.parse(value);
+        return typeof parsed?.userId === 'string' ? parsed.userId : '';
+      } catch {
+        return '';
+      }
+    };
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== USER_KEY && event.key !== null) return;
+      if (!readStoredUser()) {
+        navigate('/auth', { replace: true });
+        return;
+      }
+      if (event.key === USER_KEY && parseUserId(event.oldValue) !== parseUserId(event.newValue)) {
+        window.location.reload();
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [navigate]);
 
   const getDefaultTab = (): string => {
     const answers = localStorage.getItem('smarm_answers');

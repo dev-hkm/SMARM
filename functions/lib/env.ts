@@ -4,7 +4,13 @@ export type Env = {
   EXA_API_KEY?: string;
   EXA_API_KEY_2?: string;
   EXA_API_KEY_3?: string;
+  EXA_API_KEY_4?: string;
+  EXA_API_KEY_5?: string;
+  EXA_API_KEY_6?: string;
   TINYFISH_API_KEY?: string;
+  RIVER_API_KEY?: string;
+  RIVER_MODEL?: string;
+  RIVER_FALLBACK_MODEL?: string;
   OPENAI_API_KEY?: string;
   OPENAI_MODEL?: string;
   OPENAI_FALLBACK_MODEL?: string;

@@ -1,9 +1,13 @@
 import type { Env } from "./env";
-import { getFireworksKey, getOpenAiKey, getOpenRouterKey } from "./secrets";
+import { getFireworksKey, getOpenAiKey, getOpenRouterKey, getRiverKey } from "./secrets";
 
 export type ChatRole = "system" | "user" | "assistant";
 
-export type ChatMessage = { role: ChatRole; content: string };
+export type ChatContentPart =
+  | { type: "text"; text: string }
+  | { type: "image_url"; image_url: { url: string } };
+
+export type ChatMessage = { role: ChatRole; content: string | ChatContentPart[] };
 
 export type ResponseFormat = Record<string, unknown>;
 
@@ -51,10 +55,12 @@ export class AiProviderError extends Error {
   }
 }
 
+const RIVER_ENDPOINT = "https://api.river.ai/v1/chat/completions";
 const OPENAI_ENDPOINT = "https://api.openai.com/v1/chat/completions";
 const OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const FIREWORKS_ENDPOINT = "https://api.fireworks.ai/inference/v1/chat/completions";
 
+const RIVER_DEFAULT_MODELS = ["zai-org/GLM-5.3-Flash"];
 const DEFAULT_MODEL = "gpt-6-luna";
 const DEFAULT_FALLBACKS = ["gpt-5.6-luna", "gpt-5.4-mini"];
 const OPENROUTER_DEFAULT_MODELS = ["xiaomi/mimo-v2.6-flash", "z-ai/glm-5.3-flash"];
@@ -76,6 +82,14 @@ type Target = {
 
 function dedupe(values: string[]): string[] {
   return values.filter((value, index) => value.length > 0 && values.indexOf(value) === index);
+}
+
+export function getRiverModels(env: Env): string[] {
+  return dedupe([
+    (env.RIVER_MODEL || "").trim(),
+    (env.RIVER_FALLBACK_MODEL || "").trim(),
+    ...RIVER_DEFAULT_MODELS,
+  ]);
 }
 
 export function getOpenAiModels(env: Env): string[] {
@@ -105,6 +119,32 @@ export function getFireworksModels(env: Env): string[] {
 function getTargets(env: Env): Target[] {
   const targets: Target[] = [];
 
+  const riverKey = getRiverKey(env);
+  if (riverKey) {
+    for (const model of getRiverModels(env)) {
+      targets.push({
+        provider: "River",
+        model,
+        endpoint: RIVER_ENDPOINT,
+        apiKey: riverKey,
+        style: "max-tokens",
+      });
+    }
+  }
+
+  const fireworksKey = getFireworksKey(env);
+  if (fireworksKey) {
+    for (const model of getFireworksModels(env)) {
+      targets.push({
+        provider: "Fireworks",
+        model,
+        endpoint: FIREWORKS_ENDPOINT,
+        apiKey: fireworksKey,
+        style: "max-tokens",
+      });
+    }
+  }
+
   const openAiKey = getOpenAiKey(env);
   if (openAiKey) {
     for (const model of getOpenAiModels(env)) {
@@ -126,19 +166,6 @@ function getTargets(env: Env): Target[] {
         model,
         endpoint: OPENROUTER_ENDPOINT,
         apiKey: openRouterKey,
-        style: "max-tokens",
-      });
-    }
-  }
-
-  const fireworksKey = getFireworksKey(env);
-  if (fireworksKey) {
-    for (const model of getFireworksModels(env)) {
-      targets.push({
-        provider: "Fireworks",
-        model,
-        endpoint: FIREWORKS_ENDPOINT,
-        apiKey: fireworksKey,
         style: "max-tokens",
       });
     }
@@ -175,9 +202,9 @@ function buildPayload(options: {
     }
   } else {
     payload.max_tokens = request.maxTokens;
-    if (target.provider === "Fireworks") {
-      // GLM-5.3 on Fireworks is thinking-only: "none"/disabled is rejected, and
-      // "low" keeps reasoning short enough that answer content actually streams.
+    if (target.provider === "River" || target.provider === "Fireworks") {
+      // GLM-5.3 on both providers is thinking-only: "none"/disabled is rejected,
+      // and "low" keeps reasoning short enough that answer content streams.
       payload.reasoning_effort = "low";
     }
     if (!minimal && request.responseFormat) payload.response_format = request.responseFormat;
@@ -266,13 +293,18 @@ export function hasAssistantContent(payload: any): boolean {
   // OpenRouter may surface the message under `reasoning` when a provider splits
   // reasoning and answer content.
   const reasoning = payload?.choices?.[0]?.message?.reasoning;
-  return typeof reasoning === "string" && reasoning.trim().length > 0;
+  if (typeof reasoning === "string" && reasoning.trim().length > 0) return true;
+  const reasoningContent = payload?.choices?.[0]?.message?.reasoning_content;
+  return typeof reasoningContent === "string" && reasoningContent.trim().length > 0;
 }
 
 function getMessageContent(payload: any): string {
   const message = payload?.choices?.[0]?.message;
   if (typeof message?.content === "string" && message.content.trim()) return message.content;
   if (typeof message?.reasoning === "string" && message.reasoning.trim()) return message.reasoning;
+  if (typeof message?.reasoning_content === "string" && message.reasoning_content.trim()) {
+    return message.reasoning_content;
+  }
   return "";
 }
 

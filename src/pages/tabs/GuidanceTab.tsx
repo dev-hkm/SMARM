@@ -43,7 +43,7 @@ const CAREER_MAJOR_MAP: Record<string, string[]> = {
   "Chuyên viên an toàn lao động": ["kỹ thuật an toàn và công nghiệp môi trường", "an toàn lao động"],
   "Kỹ sư môi trường": ["kỹ thuật môi trường", "khoa học môi trường", "quản lý tài nguyên môi trường"],
   "Quản lý trang trại": ["khoa học cây trồng", "chăn nuôi thú y", "quản lý đất đai"],
-  "Thiết kế công nghiệp": ["thiết kế công nghiệp", "thiết kế sản phẩm"],
+  "Kỹ sư chế tạo máy": ["kỹ thuật cơ khí", "cơ khí chế tạo máy", "chế tạo máy"],
   "Kỹ thuật viên viễn thông": ["kỹ thuật viễn thông", "mạng máy tính và truyền thông dữ liệu"],
   "Kỹ sư vật liệu": ["khoa học vật liệu", "công nghệ vật liệu"],
   "Thợ kim hoàn": ["thiết kế trang sức", "mỹ thuật công nghiệp"],
@@ -51,7 +51,7 @@ const CAREER_MAJOR_MAP: Record<string, string[]> = {
   "Kỹ sư dầu khí": ["kỹ thuật dầu khí", "địa chất dầu khí"],
 
   "Nhà khoa học dữ liệu": ["khoa học dữ liệu", "khoa học máy tính", "trí tuệ nhân tạo"],
-  "Bác sĩ y khoa": ["y khoa", "y đa khoa", "y học", "răng hàm mặt"],
+  "Nhà nghiên cứu y sinh": ["y sinh học", "công nghệ sinh học", "y khoa"],
   "Dược sĩ nghiên cứu": ["dược học", "dược sĩ"],
   "Kỹ sư phần mềm": ["kỹ thuật phần mềm", "công nghệ thông tin", "khoa học máy tính"],
   "Chuyên viên phân tích tài chính": ["tài chính ngân hàng", "tài chính", "phân tích tài chính"],
@@ -92,7 +92,7 @@ const CAREER_MAJOR_MAP: Record<string, string[]> = {
   "Biên tập viên video": ["truyền thông đa phương tiện", "nghệ thuật điện ảnh"],
   "Nhà thiết kế công nghiệp": ["thiết kế công nghiệp", "thiết kế sản phẩm"],
 
-  "Giáo viên / Giảng viên": ["sư phạm", "giáo dục học", "sư phạm tiểu học", "sư phạm mầm non"],
+  "Giáo viên phổ thông": ["sư phạm", "giáo dục học", "sư phạm tiểu học", "sư phạm mầm non"],
   "Chuyên viên tư vấn tâm lý": ["tâm lý học", "tâm lý giáo dục", "tham vấn tâm lý"],
   "Bác sĩ đa khoa": ["y khoa", "y đa khoa"],
   "Điều dưỡng / Y tá": ["điều dưỡng", "điều dưỡng đa khoa"],
@@ -107,7 +107,7 @@ const CAREER_MAJOR_MAP: Record<string, string[]> = {
   "Nhà hoạt động xã hội": ["công tác xã hội", "xã hội học", "luật"],
   "Chuyên gia dinh dưỡng": ["dinh dưỡng và khoa học thực phẩm", "công nghệ thực phẩm", "y tế công cộng"],
   "Quản lý khách sạn": ["quản trị nhà hàng khách sạn", "quản trị dịch vụ du lịch và lữ hành"],
-  "Chuyên viên tổ chức sự kiện": ["truyền thông đa phương tiện", "quản trị kinh doanh"],
+  "Điều phối viên tình nguyện": ["công tác xã hội", "quản trị nhân lực", "truyền thông đa phương tiện"],
   "Chuyên viên đào tạo": ["quản trị nhân lực", "giáo dục học"],
   "Cảnh sát cộng đồng": ["luật", "trinh sát", "an ninh trật tự xã hội"],
   "Chuyên viên trị liệu ngôn ngữ": ["ngôn ngữ học", "tâm lý học"],
@@ -118,7 +118,7 @@ const CAREER_MAJOR_MAP: Record<string, string[]> = {
   "Doanh nhân / Khởi nghiệp": ["quản trị kinh doanh", "kinh doanh quốc tế", "khởi nghiệp và đổi mới sáng tạo"],
   "Quản lý dự án": ["quản trị kinh doanh", "quản lý dự án xây dựng"],
   "Chuyên viên bán hàng (Sales)": ["quản trị kinh doanh", "marketing", "kinh doanh quốc tế"],
-  "Chuyên viên quan hệ công chúng (PR)": ["quan hệ công chúng", "truyền thông đa phương tiện"],
+  "Chuyên viên phát triển kinh doanh (BD)": ["quản trị kinh doanh", "kinh doanh quốc tế", "marketing"],
   "Luật sư": ["luật", "luật kinh tế", "luật quốc tế"],
   "Quản lý bất động sản": ["quản lý đất đai", "kinh doanh bất động sản", "quản trị kinh doanh"],
   "Chuyên gia tư vấn chiến lược": ["quản trị kinh doanh", "kinh tế", "quản trị doanh nghiệp"],
@@ -369,6 +369,13 @@ const CAREER_RESULT_LIMIT = 24;
 // Rank of the Holland group decides how many careers it contributes.
 const CAREER_RESULT_WEIGHTS = [12, 8, 4];
 
+const careerKey = (career: string) =>
+  career
+    .toLowerCase()
+    .replace(/\(.*?\)/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+
 const pickRecommendedCareers = (top3: Array<{ category: string }>) => {
   const buckets = top3.map((item, index) =>
     (careerGroups[item.category] || []).slice(0, CAREER_RESULT_WEIGHTS[index] ?? 0),
@@ -376,8 +383,10 @@ const pickRecommendedCareers = (top3: Array<{ category: string }>) => {
   const picked: string[] = [];
   const seen = new Set<string>();
   const push = (career?: string) => {
-    if (!career || seen.has(career) || picked.length >= CAREER_RESULT_LIMIT) return;
-    seen.add(career);
+    if (!career) return;
+    const key = careerKey(career);
+    if (seen.has(key) || picked.length >= CAREER_RESULT_LIMIT) return;
+    seen.add(key);
     picked.push(career);
   };
   const longest = Math.max(0, ...buckets.map((bucket) => bucket.length));
@@ -1099,7 +1108,7 @@ Yêu cầu:
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+    <div className="p-2.5 sm:p-4 md:p-8 max-w-6xl mx-auto pb-28 sm:pb-32">
       <AnimatePresence mode="wait">
         {step === "holland" && (
           <motion.div
@@ -1127,7 +1136,7 @@ Yêu cầu:
               </div>
             </div>
 
-            <div className="p-6 md:p-10">
+            <div className="p-3 sm:p-6 md:p-10">
               <h2 className="text-3xl font-black text-black mb-8 flex items-center uppercase tracking-tight">
                 <div className="w-12 h-12 bg-red-pop border-[3px] border-black flex items-center justify-center mr-4 shadow-[4px_4px_0_#000]">
                   <Award className="w-6 h-6 text-black stroke-[3px]" />
@@ -1252,12 +1261,12 @@ Yêu cầu:
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="bg-white border-[4px] border-black shadow-[8px_8px_0_#000] p-16 text-center flex flex-col items-center justify-center min-h-[400px]">
+            <div className="bg-white border-[4px] border-black shadow-[8px_8px_0_#000] p-6 sm:p-16 text-center flex flex-col items-center justify-center min-h-[320px] sm:min-h-[400px]">
               <div className="relative mb-8">
                 <Loader2 className="w-20 h-20 text-black animate-spin" />
               </div>
 
-              <h2 className="text-3xl font-black text-black mb-6 uppercase tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-black text-black mb-6 uppercase tracking-tight">
                 {step === "searching_unis"
                   ? "Đang tìm trường..."
                   : "Đang tổng hợp dữ liệu..."}
@@ -1301,13 +1310,13 @@ Yêu cầu:
                       key={title}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-white border-[4px] border-black shadow-[6px_6px_0_#000] p-8 text-left"
+                      className="bg-white border-[4px] border-black shadow-[6px_6px_0_#000] p-4 sm:p-8 text-left"
                     >
                       <div className="flex items-center gap-4 mb-6 pb-4 border-b-[4px] border-black">
                         <div className="w-4 h-4 bg-red-pop border-[2px] border-black animate-pulse flex-shrink-0" />
-                        <h3 className="font-black text-2xl text-black uppercase tracking-tight">{title}</h3>
+                        <h3 className="font-black text-lg sm:text-2xl text-black uppercase tracking-tight break-words min-w-0">{title}</h3>
                       </div>
-                        <div className="markdown-body neubrutalism-markdown text-black font-bold text-base max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
+                        <div className="markdown-body neubrutalism-markdown text-black font-bold text-sm sm:text-base max-h-[400px] overflow-y-auto pr-2 sm:pr-4 custom-scrollbar">
                           <AiMarkdown content={content} />
                         </div>
                     </motion.div>
@@ -1326,11 +1335,11 @@ Yêu cầu:
             exit={{ opacity: 0, x: -20 }}
             className="brutal-card bg-[var(--color-background)] mb-12"
           >
-            <div className="p-6 md:p-10">
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <h2 className="text-3xl font-black text-black flex items-center uppercase tracking-tight">
-                  <div className="w-12 h-12 bg-red-pop border-[3px] border-black flex items-center justify-center mr-4 shadow-[4px_4px_0_#000]">
-                    <Building2 className="w-6 h-6 text-black stroke-[3px]" />
+            <div className="p-3 sm:p-6 md:p-10">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 sm:mb-8 gap-4">
+                <h2 className="text-2xl sm:text-3xl font-black text-black flex items-center uppercase tracking-tight">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-pop border-[3px] border-black flex items-center justify-center mr-3 sm:mr-4 shadow-[4px_4px_0_#000] flex-shrink-0">
+                    <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-black stroke-[3px]" />
                   </div>
                   Các trường phù hợp
                 </h2>
@@ -1338,7 +1347,7 @@ Yêu cầu:
                   Đã chọn: {selectedUnis.length}/5
                 </div>
               </div>
-              <p className="text-black font-bold text-base mb-10 bg-white p-5 border-[4px] border-black shadow-[6px_6px_0_#000] leading-relaxed whitespace-pre-line">
+              <p className="text-black font-bold text-sm sm:text-base mb-8 sm:mb-10 bg-white p-4 sm:p-5 border-[4px] border-black shadow-[6px_6px_0_#000] leading-relaxed whitespace-pre-line">
                 {uniSelectionMessage ||
                   (universities.length < 5
                     ? `Dựa trên các tiêu chí và yêu cầu của bạn, hệ thống AI chỉ tìm được ${universities.length} trường phù hợp nhất. ` +
@@ -1363,7 +1372,7 @@ Yêu cầu:
                     <div
                       key={index}
                       onClick={() => toggleUni(uni)}
-                      className={`p-6 border-[4px] border-black cursor-pointer transition-all flex items-start shadow-[6px_6px_0_#000] active:translate-x-1 active:translate-y-1 active:shadow-none ${
+                      className={`p-4 sm:p-6 border-[4px] border-black cursor-pointer transition-all flex items-start shadow-[6px_6px_0_#000] active:translate-x-1 active:translate-y-1 active:shadow-none ${
                         isSelected
                           ? "bg-orange-pop"
                           : "bg-white hover:bg-orange-pop/10"
@@ -1408,9 +1417,10 @@ Yêu cầu:
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-sm font-bold text-black/80 hover:text-black flex items-center mb-3 bg-white px-3 py-1 border-[2px] border-black inline-flex shadow-[2px_2px_0_#000]"
+                          className="text-xs sm:text-sm font-bold text-black/80 hover:text-black items-center mb-3 bg-white px-3 py-1 border-[2px] border-black inline-flex max-w-full shadow-[2px_2px_0_#000]"
                         >
-                          {uni.url} <ExternalLink className="w-4 h-4 ml-2 stroke-[3px]" />
+                          <span className="break-all min-w-0">{uni.url}</span>
+                          <ExternalLink className="w-4 h-4 ml-2 stroke-[3px] flex-shrink-0" />
                         </a>
                         {uni.highlights && uni.highlights.length > 0 && (
                           <p
@@ -1440,7 +1450,7 @@ Yêu cầu:
                 <button
                   onClick={searchUniDetails}
                   disabled={selectedUnis.length === 0}
-                  className="flex items-center justify-center px-8 py-4 font-black text-black text-xl uppercase bg-red-pop border-[4px] border-black shadow-[6px_6px_0_#000] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none hover:bg-orange-pop transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-x-0 disabled:active:translate-y-0 disabled:active:shadow-[6px_6px_0_#000]"
+                  className="flex items-center justify-center px-6 sm:px-8 py-4 font-black text-black text-base sm:text-xl uppercase bg-red-pop border-[4px] border-black shadow-[6px_6px_0_#000] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none hover:bg-orange-pop transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-x-0 disabled:active:translate-y-0 disabled:active:shadow-[6px_6px_0_#000] w-full md:w-auto"
                 >
                   Xem tuyển sinh
                   <ChevronRight className="w-6 h-6 ml-3 stroke-[4px]" />
@@ -1457,11 +1467,11 @@ Yêu cầu:
             animate={{ opacity: 1, x: 0 }}
             className="brutal-card bg-[var(--color-background)] mb-12"
           >
-            <div className="p-6 md:p-10">
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <h2 className="text-3xl font-black text-black flex items-center uppercase tracking-tight">
-                  <div className="w-12 h-12 bg-white border-[3px] border-black flex items-center justify-center mr-4 shadow-[4px_4px_0_#000]">
-                    <GraduationCap className="w-6 h-6 text-black stroke-[3px]" />
+            <div className="p-3 sm:p-6 md:p-10">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 sm:mb-8 gap-4">
+                <h2 className="text-2xl sm:text-3xl font-black text-black flex items-center uppercase tracking-tight">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white border-[3px] border-black flex items-center justify-center mr-3 sm:mr-4 shadow-[4px_4px_0_#000] flex-shrink-0">
+                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-black stroke-[3px]" />
                   </div>
                   Thông tin tuyển sinh
                 </h2>
@@ -1473,21 +1483,21 @@ Yêu cầu:
                   Làm lại từ đầu
                 </button>
               </div>
-              <p className="text-black font-bold text-base mb-10 bg-orange-pop p-5 border-[4px] border-black shadow-[6px_6px_0_#000] uppercase tracking-wide">
+              <p className="text-black font-bold text-sm sm:text-base mb-8 sm:mb-10 bg-orange-pop p-4 sm:p-5 border-[4px] border-black shadow-[6px_6px_0_#000] uppercase tracking-wide">
                 Dưới đây là thông tin tổng hợp về điểm chuẩn, phương thức xét tuyển và học phí của các trường bạn đã chọn.
               </p>
 
-              <div className="space-y-10 mb-12">
+              <div className="space-y-6 sm:space-y-10 mb-10 sm:mb-12">
                 {uniDetails.map((detail, index) => (
                   <div
                     key={index}
-                    className="bg-white p-8 border-[4px] border-black shadow-[8px_8px_0_#000]"
+                    className="bg-white p-3 sm:p-6 md:p-8 border-[3px] sm:border-[4px] border-black shadow-[5px_5px_0_#000] sm:shadow-[8px_8px_0_#000]"
                   >
-                    <div className="flex items-start gap-4 mb-6 pb-4 border-b-[4px] border-black">
-                      <div className="w-12 h-12 bg-red-pop border-[3px] border-black flex items-center justify-center font-black text-xl shadow-[4px_4px_0_#000] flex-shrink-0">
+                    <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b-[3px] sm:border-b-[4px] border-black">
+                      <div className="w-9 h-9 sm:w-12 sm:h-12 bg-red-pop border-[3px] border-black flex items-center justify-center font-black text-base sm:text-xl shadow-[3px_3px_0_#000] sm:shadow-[4px_4px_0_#000] flex-shrink-0">
                         {index + 1}
                       </div>
-                      <h3 className="font-black text-2xl text-black uppercase tracking-tight mt-1">
+                      <h3 className="font-black text-base sm:text-2xl text-black uppercase tracking-tight mt-0.5 sm:mt-1 break-words min-w-0">
                         {detail.uni.title || detail.uni.url}
                       </h3>
                     </div>
@@ -1499,8 +1509,8 @@ Yêu cầu:
 
                     <div className="space-y-4">
                       {detail.summary ? (
-                        <div className="bg-[var(--color-background)] p-8 border-[4px] border-black shadow-[inset_0_4px_0_rgba(0,0,0,0.1)]">
-                          <div className="text-base text-black font-bold markdown-body neubrutalism-markdown max-w-none">
+                        <div className="bg-[var(--color-background)] p-3 sm:p-6 md:p-8 border-[3px] sm:border-[4px] border-black shadow-[inset_0_4px_0_rgba(0,0,0,0.1)] overflow-hidden">
+                          <div className="text-[15px] sm:text-base text-black font-medium sm:font-bold markdown-body neubrutalism-markdown max-w-none min-w-0">
                             <AiMarkdown content={cleanText(detail.summary)} />
                           </div>
                           <div className="mt-8 pt-6 border-t-[4px] border-black">
@@ -1508,10 +1518,10 @@ Yêu cầu:
                               href={detail.uni.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm font-black text-black bg-white px-4 py-2 border-[3px] border-black inline-flex items-center shadow-[4px_4px_0_#000] hover:bg-orange-pop active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+                              className="text-xs sm:text-sm font-black text-black bg-white px-3 sm:px-4 py-2 border-[3px] border-black inline-flex items-center max-w-full shadow-[4px_4px_0_#000] hover:bg-orange-pop active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
                             >
-                              Nguồn: {detail.uni.url}{" "}
-                              <ExternalLink className="w-4 h-4 ml-2 stroke-[3px]" />
+                              <span className="break-all min-w-0">Nguồn: {detail.uni.url}</span>
+                              <ExternalLink className="w-4 h-4 ml-2 stroke-[3px] flex-shrink-0" />
                             </a>
                           </div>
                         </div>
@@ -1525,7 +1535,7 @@ Yêu cầu:
                 ))}
               </div>
 
-              <div className="flex flex-col lg:flex-row justify-between items-center bg-red-pop p-8 border-[4px] border-black shadow-[8px_8px_0_#000] gap-6">
+              <div className="flex flex-col lg:flex-row justify-between items-center bg-red-pop p-5 sm:p-8 border-[4px] border-black shadow-[8px_8px_0_#000] gap-6">
                 <button
                   onClick={() => handleSetStep("select_unis")}
                   className="brutal-btn bg-white w-full lg:w-auto"
@@ -1533,14 +1543,14 @@ Yêu cầu:
                   Quay lại
                 </button>
                 <div className="flex-1 text-center lg:text-left lg:ml-6">
-                  <h4 className="font-black text-3xl text-black mb-2 uppercase tracking-tight">Đã sẵn sàng?</h4>
-                  <p className="text-lg font-bold text-black uppercase bg-white inline-block px-3 py-1 border-[2px] border-black">
+                  <h4 className="font-black text-2xl sm:text-3xl text-black mb-2 uppercase tracking-tight">Đã sẵn sàng?</h4>
+                  <p className="text-sm sm:text-lg font-bold text-black uppercase bg-white inline-block px-3 py-1 border-[2px] border-black">
                     Bắt đầu theo dõi điểm số và lên kế hoạch học tập ngay hôm nay.
                   </p>
                 </div>
                 <button
                   onClick={finishGuidance}
-                  className="flex items-center justify-center px-10 py-5 font-black text-black text-xl uppercase bg-orange-pop border-[4px] border-black shadow-[6px_6px_0_#000] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none hover:bg-white transition-all whitespace-nowrap w-full lg:w-auto"
+                  className="flex items-center justify-center px-6 sm:px-10 py-4 sm:py-5 font-black text-black text-base sm:text-xl uppercase bg-orange-pop border-[4px] border-black shadow-[6px_6px_0_#000] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none hover:bg-white transition-all whitespace-nowrap w-full lg:w-auto"
                 >
                   Bắt đầu hành trình
                   <ArrowRight className="w-6 h-6 ml-3 stroke-[4px]" />

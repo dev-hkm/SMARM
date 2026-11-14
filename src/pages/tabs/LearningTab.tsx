@@ -587,9 +587,9 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
   const threeYearAvg = calculateThreeYearAverage();
 
   return (
-    <div className="p-4 md:p-8 pb-32 max-w-7xl mx-auto">
+    <div className="p-2.5 sm:p-4 md:p-8 pb-28 sm:pb-32 max-w-7xl mx-auto">
       {/* Header Sticky Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 bg-green-pop p-6 md:p-8 border-[4px] border-black shadow-[8px_8px_0_#000]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 sm:mb-12 gap-4 sm:gap-6 bg-green-pop p-4 sm:p-6 md:p-8 border-[3px] sm:border-[4px] border-black shadow-[5px_5px_0_#000] sm:shadow-[8px_8px_0_#000]">
         <div className="flex items-center space-x-6">
           <div className="w-16 h-16 bg-white border-[3px] border-black flex items-center justify-center shadow-[4px_4px_0_#000]">
             <BookOpen className="w-8 h-8 text-black stroke-[3px]" />

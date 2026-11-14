@@ -4,11 +4,11 @@ export const careerGroups: Record<string, string[]> = {
     'Nông nghiệp công nghệ cao', 'Logistics và quản lý chuỗi cung ứng', 'Vận hành máy móc',
     'Kỹ sư tự động hóa', 'Kiến trúc sư cảnh quan', 'Sửa chữa thiết bị y tế',
     'Kỹ thuật viên hàng không', 'Chuyên viên an toàn lao động', 'Kỹ sư môi trường',
-    'Quản lý trang trại', 'Thiết kế công nghiệp', 'Kỹ thuật viên viễn thông',
+    'Quản lý trang trại', 'Kỹ sư chế tạo máy', 'Kỹ thuật viên viễn thông',
     'Kỹ sư vật liệu', 'Thợ kim hoàn', 'Kỹ thuật viên in ấn', 'Kỹ sư dầu khí'
   ],
   I: [
-    'Nhà khoa học dữ liệu', 'Bác sĩ y khoa', 'Dược sĩ nghiên cứu', 'Kỹ sư phần mềm',
+    'Nhà khoa học dữ liệu', 'Nhà nghiên cứu y sinh', 'Dược sĩ nghiên cứu', 'Kỹ sư phần mềm',
     'Chuyên viên phân tích tài chính', 'Nhà nghiên cứu sinh học', 'Chuyên gia an ninh mạng',
     'Giảng viên đại học', 'Nhà tâm lý học lâm sàng', 'Chuyên viên phân tích thị trường',
     'Kỹ sư trí tuệ nhân tạo', 'Nhà thiên văn học', 'Kỹ sư hóa học', 'Nhà nghiên cứu vật lý',
@@ -24,17 +24,17 @@ export const careerGroups: Record<string, string[]> = {
     'Biên tập viên video', 'Nhà thiết kế công nghiệp'
   ],
   S: [
-    'Giáo viên / Giảng viên', 'Chuyên viên tư vấn tâm lý', 'Bác sĩ đa khoa', 'Điều dưỡng / Y tá',
+    'Giáo viên phổ thông', 'Chuyên viên tư vấn tâm lý', 'Bác sĩ đa khoa', 'Điều dưỡng / Y tá',
     'Nhân viên công tác xã hội', 'Chuyên viên nhân sự', 'Huấn luyện viên cá nhân',
     'Chuyên viên chăm sóc khách hàng', 'Hướng dẫn viên du lịch', 'Chuyên viên vật lý trị liệu',
     'Cố vấn học tập', 'Chuyên viên quan hệ công chúng', 'Nhà hoạt động xã hội',
-    'Chuyên gia dinh dưỡng', 'Quản lý khách sạn', 'Chuyên viên tổ chức sự kiện',
+    'Chuyên gia dinh dưỡng', 'Quản lý khách sạn', 'Điều phối viên tình nguyện',
     'Chuyên viên đào tạo', 'Cảnh sát cộng đồng', 'Chuyên viên trị liệu ngôn ngữ',
     'Tư vấn viên nghề nghiệp'
   ],
   E: [
     'Giám đốc điều hành (CEO)', 'Giám đốc marketing (CMO)', 'Doanh nhân / Khởi nghiệp',
-    'Quản lý dự án', 'Chuyên viên bán hàng (Sales)', 'Chuyên viên quan hệ công chúng (PR)',
+    'Quản lý dự án', 'Chuyên viên bán hàng (Sales)', 'Chuyên viên phát triển kinh doanh (BD)',
     'Luật sư', 'Quản lý bất động sản', 'Chuyên gia tư vấn chiến lược', 'Giám đốc nhân sự',
     'Quản lý chuỗi cửa hàng', 'Chuyên viên môi giới chứng khoán', 'Giám đốc kinh doanh',
     'Nhà tổ chức sự kiện', 'Chuyên viên đàm phán', 'Giám đốc tài chính (CFO)',

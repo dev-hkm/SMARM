@@ -521,7 +521,7 @@ Tính toán Fit score tổng thể trên thang điểm 1-100% dựa trên năng 
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 bg-transparent min-h-full">
+    <div className="p-2.5 sm:p-4 md:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 bg-transparent min-h-full">
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-[4px] border-black pb-6 bg-pink-pop p-6 shadow-[6px_6px_0_#000] border-[4px]">
         <div>
@@ -551,7 +551,7 @@ Tính toán Fit score tổng thể trên thang điểm 1-100% dựa trên năng 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-white border-[4px] border-black p-6 md:p-8 shadow-[8px_8px_0_#000] space-y-8"
+            className="bg-white border-[3px] sm:border-[4px] border-black p-3.5 sm:p-6 md:p-8 shadow-[5px_5px_0_#000] sm:shadow-[8px_8px_0_#000] space-y-6 sm:space-y-8"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* University 1 Column */}
@@ -812,7 +812,7 @@ Tính toán Fit score tổng thể trên thang điểm 1-100% dựa trên năng 
             )}
 
             {comparisonResult && (
-              <div className="bg-white border-[4px] border-black p-6 md:p-10 shadow-[8px_8px_0_#000] space-y-8 relative">
+              <div className="bg-white border-[3px] sm:border-[4px] border-black p-3.5 sm:p-6 md:p-10 shadow-[5px_5px_0_#000] sm:shadow-[8px_8px_0_#000] space-y-6 sm:space-y-8 relative">
                 {/* Live stream tag */}
                 {isLoading && (
                   <div className="flex items-center gap-2 px-4 py-2 bg-pink-pop text-black text-sm font-black tracking-widest uppercase self-start w-fit border-[3px] border-black shadow-[4px_4px_0_#000] animate-pulse">
@@ -822,7 +822,7 @@ Tính toán Fit score tổng thể trên thang điểm 1-100% dựa trên năng 
                 )}
 
                 {/* Markdown body wrapper */}
-                <div className="markdown-body neubrutalism-markdown text-base md:text-lg font-medium leading-relaxed">
+                <div className="markdown-body neubrutalism-markdown text-[15px] sm:text-base md:text-lg font-medium leading-relaxed">
                   <AiMarkdown
                     content={comparisonResult}
                     components={{

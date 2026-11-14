@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
+import {
+  adoptUser,
+  ensureSessionUser,
+  isLoggedOut,
+  loadRemoteData,
+  readStoredUser,
+  USER_KEY,
+} from '../lib/userSession';
 import { motion } from 'motion/react';
 
 const EMPTY_VALUES = ['', '[]', '{}', 'null'];
@@ -8,44 +16,6 @@ const EMPTY_VALUES = ['', '[]', '{}', 'null'];
 const hasStoredContent = (key: string) => {
   const value = localStorage.getItem(key);
   return Boolean(value && !EMPTY_VALUES.includes(value.trim()));
-};
-
-const clearUserData = () => {
-  const keysToRemove: string[] = [];
-  for (let index = 0; index < localStorage.length; index += 1) {
-    const key = localStorage.key(index);
-    if (key && key.startsWith('smarm_')) keysToRemove.push(key);
-  }
-  keysToRemove.forEach((key) => localStorage.removeItem(key));
-};
-
-const fetchUserData = async (): Promise<Record<string, unknown> | null> => {
-  try {
-    const response = await api.loadData();
-    if (!response || response.status !== 'success') return null;
-    let data = response.userData;
-    if (typeof data === 'string') {
-      try {
-        data = JSON.parse(data);
-      } catch {
-        return null;
-      }
-    }
-    if (!data || typeof data !== 'object') return null;
-    return data as Record<string, unknown>;
-  } catch {
-    return null;
-  }
-};
-
-const applyUserData = (data: Record<string, unknown> | null): boolean => {
-  if (!data) return false;
-  Object.entries(data).forEach(([key, value]) => {
-    if (!key.startsWith('smarm_') || key === 'smarm_user') return;
-    if (value === undefined || value === null) return;
-    localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
-  });
-  return true;
 };
 
 const routeAfterAuth = (navigate: (path: string, options?: { replace?: boolean }) => void) => {
@@ -59,7 +29,9 @@ export default function Auth() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [checking, setChecking] = useState(() => Boolean(localStorage.getItem('smarm_user')));
+  const [checking, setChecking] = useState(
+    () => Boolean(localStorage.getItem(USER_KEY)) && !isLoggedOut(),
+  );
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const submittedRef = React.useRef(false);
@@ -68,28 +40,28 @@ export default function Auth() {
     let active = true;
 
     const resumeSession = async () => {
-      try {
-        const session = await api.session();
-        if (!active || submittedRef.current) return;
-
-        if (!session || session.status === 'error' || !session.user) {
-          if (session?.httpStatus === 401) clearUserData();
-          setChecking(false);
-          return;
-        }
-
-        localStorage.setItem('smarm_user', JSON.stringify(session.user));
-        const dataLoaded = applyUserData(await fetchUserData());
-        if (!active || submittedRef.current) return;
-
+      // After an explicit logout, never silently sign the previous account back in.
+      if (isLoggedOut()) {
         setChecking(false);
-        if (dataLoaded || hasStoredContent('smarm_aspirations') || hasStoredContent('smarm_answers')) {
-          routeAfterAuth(navigate);
-        } else {
-          navigate('/welcome', { replace: true });
-        }
-      } catch {
-        if (active) setChecking(false);
+        return;
+      }
+
+      const result = await ensureSessionUser();
+      if (!active || submittedRef.current) return;
+
+      if (result === 'unauthenticated' || result === 'offline') {
+        setChecking(false);
+        return;
+      }
+
+      const storedUser = readStoredUser();
+      setChecking(false);
+      if (!storedUser) return;
+
+      if (hasStoredContent('smarm_aspirations') || hasStoredContent('smarm_answers')) {
+        routeAfterAuth(navigate);
+      } else {
+        navigate('/welcome', { replace: true });
       }
     };
 
@@ -130,10 +102,8 @@ export default function Auth() {
       }
 
       // Tải dữ liệu máy chủ trước khi xoá localStorage để lỗi mạng không làm mất dữ liệu cũ.
-      const serverData = isLogin ? await fetchUserData() : null;
-      clearUserData();
-      localStorage.setItem('smarm_user', JSON.stringify(response.user));
-      applyUserData(serverData);
+      const serverData = isLogin ? await loadRemoteData() : null;
+      adoptUser(response.user, serverData);
 
       if (!isLogin) {
         navigate('/welcome', { replace: true });

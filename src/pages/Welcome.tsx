@@ -2,58 +2,54 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { api } from '../lib/api';
+import { ensureSessionUser, readStoredUser, USER_KEY } from '../lib/userSession';
 
 export default function Welcome() {
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userData = localStorage.getItem('smarm_user');
-    if (!userData) {
-      navigate('/auth');
-      return;
-    }
-    
-    const aspirations = localStorage.getItem('smarm_aspirations');
-    const answers = localStorage.getItem('smarm_answers');
-    
-    const hasAspirations = aspirations && aspirations !== 'null' && aspirations.trim() !== '[]' && aspirations.trim() !== '{}';
-    const hasAnswers = answers && answers !== 'null' && answers.trim() !== '[]' && answers.trim() !== '{}';
-    
-    if (hasAspirations) {
-      navigate('/dashboard');
-      return;
-    }
+    let active = true;
 
-    if (hasAnswers) {
-      navigate('/dashboard');
-      return;
-    }
-    
-    try {
-      const parsedUser = JSON.parse(userData);
-      if (!parsedUser || typeof parsedUser !== 'object') {
+    const init = async () => {
+      if (!localStorage.getItem(USER_KEY)) {
         navigate('/auth', { replace: true });
         return;
       }
-      setUser(parsedUser);
-    } catch {
-      navigate('/auth', { replace: true });
-    }
-  }, [navigate]);
 
-  useEffect(() => {
-    let active = true;
-    void api.session()
-      .then((session) => {
-        if (!active || session?.user) return;
-        if (session?.httpStatus === 401) {
-          localStorage.removeItem('smarm_user');
-          navigate('/auth', { replace: true });
-        }
-      })
-      .catch(() => {});
+      const result = await ensureSessionUser();
+      if (!active) return;
+
+      if (result === 'unauthenticated') {
+        navigate('/auth', { replace: true });
+        return;
+      }
+      if (result === 'switched') {
+        window.location.reload();
+        return;
+      }
+
+      const storedUser = readStoredUser();
+      if (!storedUser) {
+        navigate('/auth', { replace: true });
+        return;
+      }
+
+      const aspirations = localStorage.getItem('smarm_aspirations');
+      const answers = localStorage.getItem('smarm_answers');
+      const hasAspirations = aspirations && aspirations !== 'null' && aspirations.trim() !== '[]' && aspirations.trim() !== '{}';
+      const hasAnswers = answers && answers !== 'null' && answers.trim() !== '[]' && answers.trim() !== '{}';
+
+      if (hasAspirations || hasAnswers) {
+        navigate('/dashboard', { replace: true });
+        return;
+      }
+
+      setUser(storedUser);
+    };
+
+    void init();
+
     return () => {
       active = false;
     };

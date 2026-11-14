@@ -678,13 +678,17 @@ function pickConstraintStatus(current: ConstraintStatus, next: ConstraintStatus)
 function cleanEvidence(text: string, title: string): string {
   const clean = text
     .replace(/\s+/g, " ")
+    .replace(/#{1,6}\s*/g, " ")
     .replace(/^(xem thêm|đọc tiếp|chia sẻ)\s*[:.]?\s*/iu, "")
+    .replace(/^\d+[.)]\s*/u, "")
+    .replace(/^(\.{2,}|…)+\s*/u, "")
     .replace(/^[\s|:;,.\-–—]+/u, "")
+    .replace(/\s+/g, " ")
     .trim();
   if (!clean) return "";
   if (clean.length < 25) return "";
   // Fragments of scraped tables read as garbage in the UI.
-  if (/^\d{4,}/.test(clean) && (clean.match(/\|/g) || []).length >= 2) return "";
+  if ((clean.match(/\|/g) || []).length >= 2) return "";
   const normalized = normalizeTitle(clean);
   const normalizedTitle = normalizeTitle(title);
   if (normalized === normalizedTitle) return "";

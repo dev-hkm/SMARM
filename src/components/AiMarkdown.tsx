@@ -24,6 +24,12 @@ export function normalizeAiMarkdown(content: string): string {
   // Backticks around a formula render as literal code; unwrap them.
   text = text.replace(/`(\${1,2}[\s\S]*?\$)`/g, "$1");
 
+  // Models stack "$$...$$" on consecutive lines; without blank lines remark
+  // folds them into one paragraph and they render as inline math.
+  text = text.replace(/(^|\n)[ \t]*\$\$([^\n$]+?)\$\$[ \t]*(?=\n|$)/g, (_match, lead: string, body: string) => {
+    return `${lead}\n$$\n${body.trim()}\n$$\n`;
+  });
+
   // Any doubled backslash left inside a math block (e.g. \\approx) breaks KaTeX.
   text = text.replace(/(\${1,2})([\s\S]*?)\1/g, (_whole: string, delimiter: string, body: string) => {
     const fixed = body.replace(/\\\\+(?=[A-Za-z])/g, "\\");

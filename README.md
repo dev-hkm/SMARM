@@ -152,6 +152,7 @@ cp .env.example .dev.vars
 | Biến | Bắt buộc | Mô tả |
 | --- | --- | --- |
 | `AUTH_SECRET` | Có | Chuỗi ngẫu nhiên dùng để ký cookie phiên |
+| `RIVER_API_KEY` | Không | Khoá River, được ưu tiên gọi trước OpenAI khi có mặt |
 | `OPENAI_API_KEY` | Một trong ba | Khoá OpenAI cho lớp AI chính |
 | `OPENROUTER_API_KEY` | Một trong ba | Khoá OpenRouter cho lớp AI dự phòng |
 | `FIREWORKS_API_KEY` | Một trong ba | Khoá Fireworks cho lớp AI dự phòng |
@@ -160,8 +161,12 @@ cp .env.example .dev.vars
 | `OPENAI_MODEL` | Không | Ghi đè mô hình mặc định |
 | `OPENAI_FALLBACK_MODEL` | Không | Mô hình dự phòng khi mô hình chính lỗi |
 | `OPENAI_REASONING_EFFORT` | Không | Mức suy luận: `minimal`, `low`, `medium`, `high` |
+| `RIVER_MODEL` | Không | Ghi đè mô hình River (mặc định `zai-org/GLM-5.3-Flash`) |
+| `RIVER_FALLBACK_MODEL` | Không | Mô hình River dự phòng |
 
 > Không bao giờ đưa `.dev.vars` lên Git. Tệp này đã nằm trong `.gitignore`.
+
+Nếu không muốn sửa tệp bằng tay, chạy `npm run key:setup` để mở form trên localhost và dán khoá River; form tự ghi vào `.dev.vars`.
 
 ### 4. Khởi tạo cơ sở dữ liệu
 
@@ -199,6 +204,7 @@ npm run db:migrate
 
 # Khai báo bí mật, mỗi lệnh sẽ hỏi giá trị
 npx wrangler pages secret put AUTH_SECRET --project-name smarm
+npx wrangler pages secret put RIVER_API_KEY --project-name smarm
 npx wrangler pages secret put OPENAI_API_KEY --project-name smarm
 npx wrangler pages secret put EXA_API_KEY --project-name smarm
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, LogOut, RotateCcw, Award, Settings as SettingsIcon, Heart, GraduationCap, Users } from 'lucide-react';
 import { api } from '../../lib/api';
+import { clearAccountData, markLoggedOut } from '../../lib/userSession';
 import { readJson } from '../../lib/localData';
 
 export default function SettingsTab() {
@@ -34,33 +35,29 @@ export default function SettingsTab() {
     }
   };
 
-  const clearUserData = () => {
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('smarm_')) {
-        keysToRemove.push(key);
-      }
-    }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-  };
-
   const handleLogout = async () => {
     await syncAllData();
     await api.logout().catch((error) => console.error('Logout error:', error));
-    clearUserData();
+    clearAccountData();
+    markLoggedOut();
     navigate('/auth', { replace: true });
   };
 
   const handleRetakeTest = async () => {
-    localStorage.removeItem('smarm_answers');
-    localStorage.removeItem('smarm_aspirations');
-    localStorage.removeItem('smarm_grades');
-    localStorage.removeItem('smarm_target_subjects');
-    localStorage.removeItem('smarm_target_method');
-    localStorage.removeItem('smarm_dgnl_score');
-    localStorage.removeItem('smarm_ai_analysis');
-    localStorage.removeItem('smarm_chat_sessions');
+    [
+      'smarm_answers',
+      'smarm_aspirations',
+      'smarm_grades',
+      'smarm_target_subjects',
+      'smarm_target_method',
+      'smarm_dgnl_score',
+      'smarm_ai_analysis',
+      'smarm_chat_sessions',
+      'smarm_current_session_id',
+      'smarm_guidance_results',
+      'smarm_guidance_careers',
+      'smarm_holland_code',
+    ].forEach((key) => localStorage.removeItem(key));
     await syncAllData();
     navigate('/test');
   };
@@ -74,7 +71,7 @@ export default function SettingsTab() {
   if (!user) return null;
 
   return (
-    <div className="p-6 md:p-10 pb-24 md:pb-32 max-w-7xl mx-auto">
+    <div className="p-2.5 sm:p-6 md:p-10 pb-24 md:pb-32 max-w-7xl mx-auto">
       <div className="flex items-center mb-10 pb-4 border-b-[4px] border-black">
         <div className="w-12 h-12 bg-[var(--color-yellow-pop)] border-[3px] border-black flex items-center justify-center mr-4 shadow-[4px_4px_0_#000]">
           <SettingsIcon className="w-6 h-6 text-black stroke-[3px]" />

@@ -21,6 +21,11 @@ export async function onRequestPut({ request, env }: { request: Request; env: En
   const body = await readJson(request);
   const userData = body?.userData;
   if (!userData || typeof userData !== "object" || Array.isArray(userData)) return error("Dữ liệu đồng bộ không hợp lệ.");
+  // A tab that still holds another account's snapshot must not overwrite this user.
+  const claimedUserId = typeof body?.userId === "string" ? body.userId : "";
+  if (claimedUserId && claimedUserId !== userId) {
+    return error("Tài khoản đăng nhập đã thay đổi. Dữ liệu chưa được đồng bộ.", 409);
+  }
   const payload = JSON.stringify(userData);
   if (new TextEncoder().encode(payload).byteLength > MAX_PAYLOAD_BYTES) return error("Dữ liệu đồng bộ vượt giới hạn 1.5 MB.", 413);
   await env.SMARM_DB.prepare(

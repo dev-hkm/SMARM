@@ -17,6 +17,8 @@ import {
   X,
 } from "lucide-react";
 
+import { ensureSessionUser, USER_KEY } from "../lib/userSession";
+
 const FadeInWhenVisible = ({
   children,
   delay = 0,
@@ -54,16 +56,27 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const user = localStorage.getItem("smarm_user");
-    const aspirations = localStorage.getItem("smarm_aspirations");
-    const hasUser = Boolean(user && user.trim() && user !== "null");
-    const hasAspirations = Boolean(
-      aspirations &&
-      !["", "[]", "{}", "null"].includes(aspirations.trim()),
-    );
-    if (hasUser && hasAspirations) {
-      navigate("/dashboard");
-    }
+    let active = true;
+    const check = async () => {
+      if (!localStorage.getItem(USER_KEY)) return;
+      const result = await ensureSessionUser();
+      if (!active) return;
+      if (result === "switched") {
+        window.location.reload();
+        return;
+      }
+      if (result !== "ok") return;
+      const aspirations = localStorage.getItem("smarm_aspirations");
+      const hasAspirations = Boolean(
+        aspirations &&
+        !["", "[]", "{}", "null"].includes(aspirations.trim()),
+      );
+      if (hasAspirations) navigate("/dashboard");
+    };
+    void check();
+    return () => {
+      active = false;
+    };
   }, [navigate]);
 
   const facts = [
@@ -289,7 +302,7 @@ export default function Home() {
                 <CheckCircle2 className="w-4 h-4 stroke-[3px]" />
               </div>
               <div className="text-sm font-black uppercase tracking-tight">
-                Hơn <span className="text-[var(--color-secondary)]">15+</span> học sinh đã tham gia
+                Hơn <span className="text-[var(--color-secondary)]">150</span> học sinh đã tham gia
               </div>
             </div>
           </motion.div>

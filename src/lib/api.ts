@@ -4,7 +4,14 @@ const SEARCH_TIMEOUT_MS = 140_000;
 const AUTH_TIMEOUT_MS = 25_000;
 const DATA_TIMEOUT_MS = 30_000;
 
-export type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
+export type ChatContentPart =
+  | { type: "text"; text: string }
+  | { type: "image_url"; image_url: { url: string } };
+
+export type ChatMessage = {
+  role: "system" | "user" | "assistant";
+  content: string | ChatContentPart[];
+};
 export type ChatResponse = { choices: Array<{ message: { role: string; content: string } }> };
 
 type ApiErrorBody = { message?: string; error?: string };
@@ -133,14 +140,39 @@ async function consumeStream(
   return fullText;
 }
 
+const IMAGE_DATA_URL = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+
+function normalizeContent(content: unknown): string | ChatContentPart[] {
+  if (typeof content === "string") return content.slice(0, 100_000);
+  if (!Array.isArray(content)) return "";
+  const parts: ChatContentPart[] = [];
+  for (const part of content) {
+    if (part?.type === "text" && typeof part.text === "string" && part.text.trim()) {
+      parts.push({ type: "text", text: part.text.slice(0, 100_000) });
+    } else if (
+      part?.type === "image_url" &&
+      typeof part.image_url?.url === "string" &&
+      IMAGE_DATA_URL.test(part.image_url.url)
+    ) {
+      parts.push({ type: "image_url", image_url: { url: part.image_url.url } });
+    }
+  }
+  return parts;
+}
+
+function contentIsEmpty(content: string | ChatContentPart[]): boolean {
+  if (typeof content === "string") return content.trim().length === 0;
+  return !content.some((part) => (part.type === "text" ? part.text.trim() : true));
+}
+
 function normalizeMessages(messages: any[]): ChatMessage[] {
   if (!Array.isArray(messages)) return [];
   return messages
     .map((message): ChatMessage => ({
       role: ["system", "user", "assistant"].includes(message?.role) ? message.role : "user",
-      content: typeof message?.content === "string" ? message.content.slice(0, 100_000) : "",
+      content: normalizeContent(message?.content),
     }))
-    .filter((message) => message.content.trim().length > 0);
+    .filter((message) => !contentIsEmpty(message.content));
 }
 
 async function chat(
@@ -260,19 +292,24 @@ export const api = {
     return requestJson("/api/user/data", {}, DATA_TIMEOUT_MS);
   },
 
-  async syncData(_userId: string, userData: Record<string, unknown>) {
+  async syncData(userId: string, userData: Record<string, unknown>) {
     return requestJson(
       "/api/user/data",
       {
         method: "PUT",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ userData }),
+        body: JSON.stringify({ userId, userData }),
       },
       DATA_TIMEOUT_MS,
     );
   },
 
   async syncUserData() {
+    try {
+      if (localStorage.getItem("smarm_logged_out") === "1") return;
+    } catch {
+      return;
+    }
     const userStr = localStorage.getItem("smarm_user");
     if (!userStr) return;
     let user: any = {};
@@ -281,10 +318,12 @@ export const api = {
     } catch {
       return;
     }
+    if (!user?.userId) return;
+    const skip = new Set(["smarm_user", "smarm_local_users", "smarm_logged_out", "smarm_test_music_muted"]);
     const userData: Record<string, unknown> = {};
     for (let index = 0; index < localStorage.length; index += 1) {
       const key = localStorage.key(index);
-      if (!key || !key.startsWith("smarm_") || key === "smarm_user" || key === "smarm_local_users") continue;
+      if (!key || !key.startsWith("smarm_") || skip.has(key)) continue;
       const value = localStorage.getItem(key);
       try {
         userData[key] = JSON.parse(value || "null");
@@ -292,7 +331,7 @@ export const api = {
         userData[key] = value;
       }
     }
-    return this.syncData(user.userId || user.username, userData);
+    return this.syncData(user.userId, userData);
   },
 
   async exaSearch(query: string, numResults = 5) {

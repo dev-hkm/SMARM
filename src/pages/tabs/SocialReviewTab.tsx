@@ -188,7 +188,7 @@ export default function SocialReviewTab() {
   }
 
   return (
-    <div className="p-4 md:p-8 pb-24 md:pb-32 max-w-7xl mx-auto space-y-8">
+    <div className="p-2.5 sm:p-4 md:p-8 pb-24 md:pb-32 max-w-7xl mx-auto space-y-6 sm:space-y-8">
       <div className="mb-10 pb-4 border-b-[4px] border-black">
         <h1 className="text-4xl font-black text-black flex items-center mb-4 uppercase tracking-tight">
           <div className="w-12 h-12 bg-blue-pop border-[3px] border-black flex items-center justify-center mr-4 shadow-[4px_4px_0_#000]">
@@ -224,7 +224,7 @@ export default function SocialReviewTab() {
           key={selectedUni.name}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="brutal-card bg-white p-6 md:p-10"
+          className="brutal-card bg-white p-3.5 sm:p-6 md:p-10"
         >
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b-[4px] border-black gap-6">
             <div>

@@ -14,13 +14,24 @@ export function normalizeSecret(value: unknown): string {
 }
 
 export function getExaKeys(env: Env): string[] {
-  return [env.EXA_API_KEY, env.EXA_API_KEY_2, env.EXA_API_KEY_3]
+  return [
+    env.EXA_API_KEY,
+    env.EXA_API_KEY_2,
+    env.EXA_API_KEY_3,
+    env.EXA_API_KEY_4,
+    env.EXA_API_KEY_5,
+    env.EXA_API_KEY_6,
+  ]
     .map(normalizeSecret)
     .filter((key, index, all) => key.length > 0 && all.indexOf(key) === index);
 }
 
 export function getTinyFishKey(env: Env): string {
   return normalizeSecret(env.TINYFISH_API_KEY);
+}
+
+export function getRiverKey(env: Env): string {
+  return normalizeSecret(env.RIVER_API_KEY);
 }
 
 export function getOpenAiKey(env: Env): string {

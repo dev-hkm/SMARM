@@ -12,6 +12,7 @@
     "db:migrate:local": "wrangler d1 migrations apply smarm-db --local",
     "db:migrate": "wrangler d1 migrations apply smarm-db --remote",
     "clean": "node scripts/clean.mjs",
+    "key:setup": "node scripts/key-setup.mjs",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

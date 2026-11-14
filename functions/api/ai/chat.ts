@@ -16,17 +16,54 @@ import {
 
 const MAX_MESSAGES = 30;
 const MAX_MESSAGE_CHARS = 100_000;
+const MAX_IMAGES_PER_MESSAGE = 3;
+const MAX_IMAGE_CHARS = 2_000_000;
+const IMAGE_DATA_URL = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+
+function sanitizeContent(content: unknown): ChatMessage["content"] | null {
+  if (typeof content === "string") return content.slice(0, MAX_MESSAGE_CHARS);
+  if (!Array.isArray(content)) return null;
+
+  const parts: ChatMessage["content"] = [];
+  let images = 0;
+  let totalChars = 0;
+  for (const part of content) {
+    if (typeof part?.text === "string" && part.text.trim()) {
+      const text = part.text.slice(0, MAX_MESSAGE_CHARS);
+      totalChars += text.length;
+      parts.push({ type: "text", text });
+      continue;
+    }
+    const url = part?.image_url?.url;
+    if (
+      part?.type === "image_url" &&
+      typeof url === "string" &&
+      images < MAX_IMAGES_PER_MESSAGE &&
+      url.length <= MAX_IMAGE_CHARS &&
+      IMAGE_DATA_URL.test(url)
+    ) {
+      images += 1;
+      totalChars += url.length;
+      parts.push({ type: "image_url", image_url: { url } });
+    }
+  }
+  if (totalChars > MAX_MESSAGE_CHARS * 2) return null;
+  return parts.length ? parts : null;
+}
 
 function sanitizeMessages(value: unknown): ChatMessage[] {
   if (!Array.isArray(value)) return [];
   return value
     .slice(0, MAX_MESSAGES)
-    .map((message): ChatMessage => ({
-      role: ["system", "user", "assistant"].includes(message?.role) ? message.role : "user",
-      content:
-        typeof message?.content === "string" ? message.content.slice(0, MAX_MESSAGE_CHARS) : "",
-    }))
-    .filter((message) => message.content.trim().length > 0);
+    .map((message): ChatMessage | null => {
+      const content = sanitizeContent(message?.content);
+      if (content === null) return null;
+      return {
+        role: ["system", "user", "assistant"].includes(message?.role) ? message.role : "user",
+        content,
+      };
+    })
+    .filter((message): message is ChatMessage => message !== null);
 }
 
 function sanitizeResponseFormat(value: unknown): ResponseFormat | undefined {

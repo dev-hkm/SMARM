@@ -226,7 +226,7 @@ export default function PlannerTab() {
   const days = ['2', '3', '4', '5', '6', '7', 'CN'];
 
   return (
-    <div className="p-4 md:p-8 pb-32 max-w-7xl mx-auto space-y-12">
+    <div className="p-2.5 sm:p-4 md:p-8 pb-28 sm:pb-32 max-w-7xl mx-auto space-y-8 sm:space-y-12">
       {/* 1. Countdown Hero */}
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}

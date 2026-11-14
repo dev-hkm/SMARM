@@ -19,7 +19,8 @@ import {
   Check,
   Download,
   Pencil,
-  Search
+  Search,
+  ImagePlus
 } from "lucide-react";
 import { useToast } from "../../components/Toast";
 import { AiMarkdown } from "../../components/AiMarkdown";
@@ -191,7 +192,39 @@ type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  images?: string[];
 };
+
+const MAX_IMAGES = 3;
+
+function compressImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Không đọc được ảnh."));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Ảnh không hợp lệ."));
+      img.onload = () => {
+        const maxSide = 1024;
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Trình duyệt không hỗ trợ xử lý ảnh."));
+          return;
+        }
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.72));
+      };
+      img.src = String(reader.result || "");
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 type ChatSession = {
   id: string;
@@ -204,47 +237,126 @@ const ChatInput = memo(({
   onSend,
   isLoading
 }: {
-  onSend: (text: string) => void;
+  onSend: (text: string, images: string[]) => void;
   isLoading: boolean;
 }) => {
   const [localInput, setLocalInput] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [readingImages, setReadingImages] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const { showToast } = useToast();
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files?.length || isLoading) return;
+    const room = MAX_IMAGES - images.length;
+    if (room <= 0) {
+      showToast(`Chỉ gửi tối đa ${MAX_IMAGES} ảnh mỗi lần.`, "error");
+      return;
+    }
+    const picked = Array.from(files).slice(0, room);
+    if (files.length > room) {
+      showToast(`Chỉ gửi tối đa ${MAX_IMAGES} ảnh mỗi lần, đã bỏ ${files.length - room} ảnh.`, "info");
+    }
+    setReadingImages(true);
+    try {
+      const encoded: string[] = [];
+      for (const file of picked) {
+        if (!file.type.startsWith("image/")) continue;
+        encoded.push(await compressImage(file));
+      }
+      if (encoded.length) setImages((prev) => [...prev, ...encoded].slice(0, MAX_IMAGES));
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Không xử lý được ảnh.", "error");
+    } finally {
+      setReadingImages(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
 
   const handleSend = () => {
-    if (!localInput.trim() || isLoading) return;
-    onSend(localInput.trim());
+    if (isLoading || readingImages) return;
+    const text = localInput.trim();
+    if (!text && images.length === 0) return;
+    onSend(text || "Phân tích giúp mình ảnh này nhé.", images);
     setLocalInput("");
+    setImages([]);
   };
 
   return (
-    <div className="relative flex items-end bg-white border-[4px] border-black shadow-[6px_6px_0_#000] p-2 pl-6 pr-2 focus-within:shadow-[8px_8px_0_#000] transition-all duration-300">
-      <textarea
-        value={localInput}
-        onChange={(e) => {
-          setLocalInput(e.target.value);
-          e.target.style.height = 'auto';
-          e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-            e.currentTarget.style.height = 'auto';
-          }
-        }}
-        placeholder="Hỏi Smarm AI..."
-        className="flex-1 bg-transparent py-3 text-black placeholder:text-black/40 focus:outline-none text-base md:text-lg font-bold resize-none min-h-[48px] max-h-[120px] custom-scrollbar"
-        disabled={isLoading}
-        rows={1}
-      />
-      <div className="pl-4 flex-shrink-0 mb-1">
+    <div className="relative bg-white border-[4px] border-black shadow-[6px_6px_0_#000] p-2 pl-3 pr-2 focus-within:shadow-[8px_8px_0_#000] transition-all duration-300">
+      {images.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-2 pt-1 pb-2">
+          {images.map((src, index) => (
+            <div key={index} className="relative">
+              <img
+                src={src}
+                alt={`Ảnh ${index + 1}`}
+                className="w-16 h-16 md:w-20 md:h-20 object-cover border-[3px] border-black shadow-[3px_3px_0_#000]"
+              />
+              <button
+                onClick={() => setImages((prev) => prev.filter((_, i) => i !== index))}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-pop border-[2px] border-black flex items-center justify-center shadow-[2px_2px_0_#000] cursor-pointer"
+                title="Bỏ ảnh"
+              >
+                <X className="w-3.5 h-3.5 stroke-[3px]" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="flex items-end">
         <button
-          onClick={handleSend}
-          disabled={!localInput.trim() || isLoading}
-          className="w-12 h-12 bg-cyan-pop border-[3px] border-black text-black flex items-center justify-center hover:bg-purple-pop active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:active:translate-x-0 disabled:active:translate-y-0 transition-all shadow-[2px_2px_0_#000] disabled:shadow-[2px_2px_0_#000] flex-shrink-0 cursor-pointer"
+          onClick={() => fileRef.current?.click()}
+          disabled={isLoading || readingImages || images.length >= MAX_IMAGES}
+          className="flex-shrink-0 mb-1 p-2 text-black bg-yellow-pop hover:bg-purple-pop border-[3px] border-black shadow-[2px_2px_0_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-40 disabled:active:translate-x-0 disabled:active:translate-y-0 cursor-pointer"
+          title={`Gửi ảnh (tối đa ${MAX_IMAGES})`}
         >
-          <Send className="w-6 h-6 stroke-[3px] ml-1" />
+          {readingImages ? (
+            <Loader2 className="w-6 h-6 stroke-[3px] animate-spin" />
+          ) : (
+            <ImagePlus className="w-6 h-6 stroke-[3px]" />
+          )}
         </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          multiple
+          className="hidden"
+          onChange={(e) => handleFiles(e.target.files)}
+        />
+        <textarea
+          value={localInput}
+          onChange={(e) => {
+            setLocalInput(e.target.value);
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+              e.currentTarget.style.height = 'auto';
+            }
+          }}
+          placeholder="Hỏi Smarm AI..."
+          className="flex-1 bg-transparent px-3 py-3 text-black placeholder:text-black/40 focus:outline-none text-base md:text-lg font-bold resize-none min-h-[48px] max-h-[120px] custom-scrollbar"
+          disabled={isLoading}
+          rows={1}
+        />
+        <div className="pl-2 flex-shrink-0 mb-1">
+          <button
+            onClick={handleSend}
+            disabled={(!localInput.trim() && images.length === 0) || isLoading || readingImages}
+            className="w-12 h-12 bg-cyan-pop border-[3px] border-black text-black flex items-center justify-center hover:bg-purple-pop active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:active:translate-x-0 disabled:active:translate-y-0 transition-all shadow-[2px_2px_0_#000] disabled:shadow-[2px_2px_0_#000] flex-shrink-0 cursor-pointer"
+          >
+            <Send className="w-6 h-6 stroke-[3px] ml-1" />
+          </button>
+        </div>
       </div>
+      <p className="px-2 pt-1 pb-0.5 text-[10px] font-black uppercase tracking-widest text-black/45">
+        Tối đa {MAX_IMAGES} ảnh · ảnh sẽ được nén tự động
+      </p>
     </div>
   );
 });
@@ -460,12 +572,17 @@ export default function ChatTab({ onBack }: ChatTabProps) {
     setRenameTitle("");
   };
 
-  const sendMessage = async (userMsg: string) => {
-    if (!userMsg || isLoading || !currentSessionId) return;
+  const sendMessage = async (userMsg: string, images: string[] = []) => {
+    if ((!userMsg && images.length === 0) || isLoading || !currentSessionId) return;
 
     const updatedMessages: Message[] = [
       ...(currentSession?.messages || []),
-      { id: Date.now().toString(), role: "user", content: userMsg },
+      {
+        id: Date.now().toString(),
+        role: "user",
+        content: userMsg,
+        ...(images.length ? { images } : {}),
+      },
     ];
 
     // Update session with user message
@@ -541,7 +658,19 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
 
       const apiMessages = [
         { role: "system", content: systemInstruction },
-        ...updatedMessages.map((m) => ({ role: m.role, content: m.content })),
+        ...updatedMessages.map((m) => ({
+          role: m.role,
+          content:
+            m.role === "user" && m.images?.length
+              ? [
+                  ...(m.content.trim() ? [{ type: "text" as const, text: m.content }] : []),
+                  ...m.images.map((url) => ({
+                    type: "image_url" as const,
+                    image_url: { url },
+                  })),
+                ]
+              : m.content,
+        })),
       ];
 
       // Add a placeholder message for the assistant stream
@@ -645,8 +774,8 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col h-full relative bg-transparent">
         {/* Floating Header */}
-        <div className="w-full p-3 md:p-4 pb-0 flex-shrink-0 flex justify-center z-30">
-          <header className="w-full max-w-6xl bg-white border-[3px] border-black p-2 md:p-3 flex items-center justify-between shadow-[4px_4px_0_#000] pointer-events-auto">
+        <div className="w-full p-2 sm:p-3 md:p-4 pb-0 flex-shrink-0 flex justify-center z-30">
+          <header className="w-full max-w-6xl bg-white border-[3px] border-black p-2 md:p-3 flex items-center justify-between gap-2 shadow-[4px_4px_0_#000] pointer-events-auto">
             {/* Left: Navigation Controls */}
             <div className="flex items-center">
               <button
@@ -701,13 +830,13 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
         {/* Chat Container */}
         <div className="flex-1 flex flex-col min-h-0 w-full overflow-hidden relative">
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto px-4 md:px-12 pt-6 pb-36 space-y-10 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-2.5 sm:px-4 md:px-12 pt-3 md:pt-6 pb-28 md:pb-36 space-y-5 md:space-y-8 custom-scrollbar">
             {currentSession?.messages.length === 1 && (
-              <div className="flex flex-col items-center justify-center py-12">
-                 <div className="w-24 h-24 bg-cyan-pop border-[4px] border-black flex items-center justify-center mb-8 shadow-[6px_6px_0_#000]">
-                    <Bot className="w-12 h-12 text-black stroke-[3px]" />
+              <div className="flex flex-col items-center justify-center py-6 md:py-12">
+                 <div className="w-16 h-16 sm:w-24 sm:h-24 bg-cyan-pop border-[4px] border-black flex items-center justify-center mb-5 sm:mb-8 shadow-[6px_6px_0_#000]">
+                    <Bot className="w-9 h-9 sm:w-12 sm:h-12 text-black stroke-[3px]" />
                  </div>
-                 <p className="text-black text-lg font-bold text-center max-w-md bg-white p-6 border-[4px] border-black shadow-[6px_6px_0_#000]">
+                 <p className="text-black text-[15px] sm:text-lg font-bold text-center max-w-md bg-white p-4 sm:p-6 border-[3px] sm:border-[4px] border-black shadow-[5px_5px_0_#000] sm:shadow-[6px_6px_0_#000]">
                    Mình đã sẵn sàng! Bạn có thể hỏi mình về bài tập Toán, Lý, Hóa hoặc cần lời khuyên về nguyện vọng đại học nhé.
                  </p>
               </div>
@@ -720,9 +849,13 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
                 className="flex w-full"
               >
                 <div className={`flex w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`flex max-w-[90%] md:max-w-[80%] gap-4 md:gap-6 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                  <div className={`flex w-full sm:w-auto max-w-full sm:max-w-[92%] md:max-w-[82%] gap-2 sm:gap-4 md:gap-6 ${
+                    msg.role === "user"
+                      ? "flex-row-reverse"
+                      : "flex-col sm:flex-row"
+                  }`}>
                     <div
-                      className={`w-10 h-10 md:w-12 md:h-12 border-[3px] border-black flex items-center justify-center flex-shrink-0 shadow-[4px_4px_0_#000] ${
+                      className={`hidden sm:flex w-10 h-10 md:w-12 md:h-12 border-[3px] border-black items-center justify-center flex-shrink-0 shadow-[4px_4px_0_#000] ${
                         msg.role === "user"
                           ? "bg-cyan-pop text-black"
                           : "bg-white text-black"
@@ -734,22 +867,45 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
                         <Bot className="w-6 h-6 md:w-7 md:h-7 stroke-[3px]" />
                       )}
                     </div>
-                    <div className={`flex flex-col min-w-0 ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                      <div className="text-xs font-black text-black uppercase tracking-widest mb-2 px-2 bg-white border-[2px] border-black inline-block shadow-[2px_2px_0_#000]">
-                        {msg.role === "user" ? "Bạn" : "Smarm AI"}
+                    <div className={`flex flex-col min-w-0 w-full ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                      <div className="flex items-center gap-1.5 mb-1.5 sm:mb-2">
+                        <span className={`sm:hidden w-5 h-5 border-[2px] border-black flex items-center justify-center flex-shrink-0 ${
+                          msg.role === "user" ? "bg-cyan-pop" : "bg-white"
+                        }`}>
+                          {msg.role === "user" ? (
+                            <User className="w-3 h-3 stroke-[3px]" />
+                          ) : (
+                            <Bot className="w-3 h-3 stroke-[3px]" />
+                          )}
+                        </span>
+                        <div className="text-[10px] sm:text-xs font-black text-black uppercase tracking-widest px-2 bg-white border-[2px] border-black inline-block shadow-[2px_2px_0_#000]">
+                          {msg.role === "user" ? "Bạn" : "Smarm AI"}
+                        </div>
                       </div>
                       {msg.role === "user" ? (
-                        <div className="px-6 py-4 bg-white border-[4px] border-black text-black shadow-[6px_6px_0_#000]">
-                          <div className="text-base font-bold leading-relaxed whitespace-pre-wrap">
+                        <div className="px-3.5 py-2.5 md:px-6 md:py-4 bg-white border-[3px] sm:border-[4px] border-black text-black shadow-[4px_4px_0_#000] md:shadow-[6px_6px_0_#000] max-w-[90%] sm:max-w-full">
+                          {msg.images && msg.images.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {msg.images.map((src, index) => (
+                                <img
+                                  key={index}
+                                  src={src}
+                                  alt={`Ảnh đính kèm ${index + 1}`}
+                                  className="max-h-40 max-w-[45%] object-cover border-[3px] border-black shadow-[3px_3px_0_#000]"
+                                />
+                              ))}
+                            </div>
+                          )}
+                          <div className="text-[15px] sm:text-base font-bold leading-relaxed whitespace-pre-wrap break-words">
                             {msg.content}
                           </div>
                         </div>
                       ) : (
-                        <div className="py-2 text-black w-full">
+                        <div className="py-1 sm:py-2 text-black w-full min-w-0">
                           {msg.content === "" ? (
                             <ThinkingIndicator />
                           ) : (
-                            <div className="markdown-body neubrutalism-markdown text-base font-medium">
+                            <div className="markdown-body neubrutalism-markdown text-[15px] sm:text-base font-medium">
                               <MemoizedMarkdown content={msg.content} />
                             </div>
                           )}
@@ -764,7 +920,7 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
           </div>
 
           {/* Floating Input Area */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-transparent pointer-events-none z-20 flex justify-center w-full">
+          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4 md:p-6 pb-[max(0.5rem,env(safe-area-inset-bottom))] bg-transparent pointer-events-none z-20 flex justify-center w-full">
             <div className="w-full max-w-4xl pointer-events-auto">
               <ChatInput onSend={sendMessage} isLoading={isLoading} />
             </div>
