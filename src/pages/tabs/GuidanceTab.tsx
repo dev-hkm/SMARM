@@ -23,6 +23,16 @@ import {
 import { api } from "../../lib/api";
 import { writeJson } from "../../lib/localData";
 import { readAnswers, normalizeGroupScore, GROUP_MAX_SCORE, type HollandGroup } from "../../lib/holland";
+import {
+  INSTRUMENT_VERSION,
+  clearGuidanceStart,
+  markGuidanceStart,
+  readGuidanceSurvey,
+  readPreSurvey,
+  recordFirstUniversityOpen,
+  writeGuidanceSurvey,
+  type GuidanceSurvey,
+} from "../../lib/instruments";
 import { useToast } from "../../components/Toast";
 import {
   buildUniversitySearchRequest,
@@ -382,6 +392,32 @@ const GROUP_COLORS: Record<HollandGroup, string> = {
   C: "var(--color-yellow-pop)",
 };
 
+const SurveyScale = ({
+  value,
+  onChange,
+  ariaLabel,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  ariaLabel: string;
+}) => (
+  <div className="grid grid-cols-5 gap-1.5" role="group" aria-label={ariaLabel}>
+    {[1, 2, 3, 4, 5].map((option) => (
+      <button
+        key={option}
+        type="button"
+        onClick={() => onChange(option)}
+        aria-pressed={value === option}
+        className={`py-2 border-[3px] border-black font-black text-sm shadow-[3px_3px_0_#000] transition-colors active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+          value === option ? "bg-black text-white" : "bg-white text-black hover:bg-[var(--color-yellow-pop)]"
+        }`}
+      >
+        {option}
+      </button>
+    ))}
+  </div>
+);
+
 const careerKey = (career: string) =>
   career
     .toLowerCase()
@@ -492,6 +528,7 @@ export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
   const [universities, setUniversities] = useState<any[]>([]);
   const [selectedUnis, setSelectedUnis] = useState<any[]>([]);
   const [uniDetails, setUniDetails] = useState<any[]>([]);
+  const [autoSaved, setAutoSaved] = useState(false);
   const [targetProgress, setTargetProgress] = useState(0);
   const [displayProgress, setDisplayProgress] = useState(0);
   const [loadingStatus, setLoadingStatus] = useState("");
@@ -500,6 +537,15 @@ export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
   const mountedRef = useRef(true);
 
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [guidanceSurvey, setGuidanceSurvey] = useState<GuidanceSurvey | null>(() => readGuidanceSurvey());
+  const preSurvey = useMemo(() => readPreSurvey(), []);
+  const [surveyDraft, setSurveyDraft] = useState<{
+    baseline: number;
+    foundNew: "" | "yes" | "no";
+    fit: number;
+    nextStep: number;
+    recommend: number;
+  }>({ baseline: 0, foundNew: "", fit: 0, nextStep: 0, recommend: 0 });
 
   useEffect(() => {
     if (displayProgress < targetProgress) {
@@ -530,6 +576,7 @@ export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
       setUniDetails(saved.uniDetails || []);
       setUserConstraint(saved.userConstraint || "");
       setUniSelectionMessage(saved.uniSelectionMessage || "");
+      setAutoSaved(Boolean(localStorage.getItem("smarm_aspirations")));
       setStep("show_details");
     } else if (saved && saved.universities && saved.universities.length > 0) {
       setSelectedCareers(saved.selectedCareers || []);
@@ -575,6 +622,10 @@ export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
 
     return { scores: sortedScores, top3, hollandCode, recommendedCareers };
   }, [answers]);
+
+  useEffect(() => {
+    if (results) markGuidanceStart();
+  }, [results]);
 
   if (!results) {
     return (
@@ -1068,6 +1119,9 @@ Yêu cầu:
         uniSelectionMessage,
       });
 
+      persistGuidanceProfile(details, selectedCareers);
+      setAutoSaved(true);
+
       handleSetStep("show_details");
     } catch (error: any) {
       console.error("Detail search error:", error);
@@ -1079,11 +1133,40 @@ Yêu cầu:
     }
   };
 
-  const finishGuidance = () => {
-    const aspirations = uniDetails.map((d) => ({
+  const submitSurvey = () => {
+    const baseline = preSurvey?.value ?? (surveyDraft.baseline || null);
+    if (
+      baseline === null ||
+      surveyDraft.foundNew === "" ||
+      !surveyDraft.fit ||
+      !surveyDraft.nextStep ||
+      !surveyDraft.recommend
+    ) {
+      showToast("Vui lòng trả lời đủ các câu trước khi gửi.", "info");
+      return;
+    }
+    const payload: GuidanceSurvey = {
+      version: INSTRUMENT_VERSION,
+      at: new Date().toISOString(),
+      hollandCode: results?.hollandCode,
+      baseline,
+      baselineSource: preSurvey?.value ? "pre" : "recall",
+      foundNew: surveyDraft.foundNew === "yes",
+      fit: surveyDraft.fit,
+      nextStep: surveyDraft.nextStep,
+      recommend: surveyDraft.recommend,
+    };
+    writeGuidanceSurvey(payload);
+    setGuidanceSurvey(payload);
+    api.syncUserData().catch((error) => console.error("Failed to sync survey:", error));
+    showToast("Đã gửi phản hồi. Cảm ơn bạn!", "success");
+  };
+
+  const persistGuidanceProfile = (details: any[], careers: string[]) => {
+    const aspirations = details.map((d) => ({
       name: d.uni.title || d.uni.url,
       url: d.uni.url,
-      careers: selectedCareers,
+      careers,
       targetScore: d.targetScore,
       method: d.method,
       targetSubjects: d.targetSubjects,
@@ -1097,6 +1180,10 @@ Yêu cầu:
     api.syncUserData().catch((e) => {
       console.error("Failed to sync data to server:", e);
     });
+  };
+
+  const finishGuidance = () => {
+    persistGuidanceProfile(uniDetails, selectedCareers);
 
     clearGuidanceResults();
     showToast("Đã lưu kết quả tư vấn! Chuyển sang trang học tập.", "success");
@@ -1108,6 +1195,7 @@ Yêu cầu:
 
   const handleReset = () => {
     clearGuidanceResults();
+    clearGuidanceStart();
     localStorage.removeItem("smarm_aspirations");
     localStorage.removeItem(GUIDANCE_CAREERS_KEY);
     setSelectedCareers([]);
@@ -1276,6 +1364,143 @@ Yêu cầu:
                     </Link>
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-white border-[4px] border-black shadow-[6px_6px_0_#000] p-5 md:p-7 mb-12">
+                <div className="flex flex-wrap items-center gap-3 mb-2">
+                  <h3 className="font-black text-lg md:text-xl uppercase tracking-tight">
+                    Phiếu phản hồi 30 giây
+                  </h3>
+                  <span className="text-[10px] font-black uppercase tracking-widest bg-[var(--color-cyan-pop)] border-[2px] border-black px-2 py-0.5">
+                    Tự nguyện · ẩn danh
+                  </span>
+                </div>
+                {guidanceSurvey ? (
+                  <div className="flex items-start gap-3 mt-3">
+                    <div className="w-8 h-8 bg-[var(--color-green-pop)] border-[3px] border-black flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 stroke-[4px]" />
+                    </div>
+                    <p className="text-sm font-bold text-black/80 leading-relaxed">
+                      Đã ghi nhận phản hồi ngày{" "}
+                      {new Date(guidanceSurvey.at).toLocaleDateString("vi-VN")}. Cảm ơn bạn đã giúp nhóm đo
+                      hiệu quả của Astra.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-5 mt-4">
+                    <p className="text-xs sm:text-sm font-bold text-black/70 leading-relaxed">
+                      Năm câu ngắn, không thu thập tên hay email. Kết quả chỉ dùng để tổng hợp trong báo cáo
+                      nghiên cứu.
+                    </p>
+
+                    <div>
+                      <p className="text-sm font-black mb-2">
+                        1. Trước khi dùng Astra, bạn đã biết rõ ngành mình muốn học chưa?
+                      </p>
+                      {preSurvey?.value ? (
+                        <p className="text-xs font-bold text-black/70 bg-[var(--color-background)] border-[3px] border-black px-3 py-2">
+                          Bạn đã trả lời <strong>{preSurvey.value}/5</strong> trước khi làm bài test.
+                        </p>
+                      ) : (
+                        <>
+                          <SurveyScale
+                            value={surveyDraft.baseline}
+                            onChange={(baseline) => setSurveyDraft((prev) => ({ ...prev, baseline }))}
+                            ariaLabel="Mức độ biết rõ ngành trước khi dùng Astra"
+                          />
+                          <div className="flex justify-between text-[10px] font-black uppercase tracking-wide text-black/50 mt-1">
+                            <span>1 · Chưa rõ</span>
+                            <span>5 · Rất rõ</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-black mb-2">
+                        2. Sau khi xem kết quả, bạn tìm được ít nhất một ngành hoặc trường mới để tìm hiểu
+                        thêm?
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 max-w-xs">
+                        {[
+                          { key: "yes" as const, label: "Có" },
+                          { key: "no" as const, label: "Chưa" },
+                        ].map((option) => (
+                          <button
+                            key={option.key}
+                            type="button"
+                            onClick={() =>
+                              setSurveyDraft((prev) => ({ ...prev, foundNew: option.key }))
+                            }
+                            aria-pressed={surveyDraft.foundNew === option.key}
+                            className={`py-2 border-[3px] border-black font-black text-sm shadow-[3px_3px_0_#000] transition-colors active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                              surveyDraft.foundNew === option.key
+                                ? "bg-black text-white"
+                                : "bg-white text-black hover:bg-[var(--color-yellow-pop)]"
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-black mb-2">
+                        3. Kết quả Holland mô tả đúng sở thích của bạn ở mức nào?
+                      </p>
+                      <SurveyScale
+                        value={surveyDraft.fit}
+                        onChange={(fit) => setSurveyDraft((prev) => ({ ...prev, fit }))}
+                        ariaLabel="Mức độ kết quả mô tả đúng sở thích"
+                      />
+                      <div className="flex justify-between text-[10px] font-black uppercase tracking-wide text-black/50 mt-1">
+                        <span>1 · Rất sai</span>
+                        <span>5 · Rất đúng</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-black mb-2">
+                        4. Bạn đã biết bước tiếp theo cần làm (chọn tổ hợp môn, tra điểm chuẩn, xem học
+                        phí)?
+                      </p>
+                      <SurveyScale
+                        value={surveyDraft.nextStep}
+                        onChange={(nextStep) => setSurveyDraft((prev) => ({ ...prev, nextStep }))}
+                        ariaLabel="Mức độ rõ bước tiếp theo"
+                      />
+                      <div className="flex justify-between text-[10px] font-black uppercase tracking-wide text-black/50 mt-1">
+                        <span>1 · Chưa biết</span>
+                        <span>5 · Rất rõ</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-black mb-2">
+                        5. Bạn sẽ giới thiệu Astra cho bạn cùng lớp?
+                      </p>
+                      <SurveyScale
+                        value={surveyDraft.recommend}
+                        onChange={(recommend) => setSurveyDraft((prev) => ({ ...prev, recommend }))}
+                        ariaLabel="Mức độ sẵn sàng giới thiệu Astra"
+                      />
+                      <div className="flex justify-between text-[10px] font-black uppercase tracking-wide text-black/50 mt-1">
+                        <span>1 · Chắc chắn không</span>
+                        <span>5 · Chắc chắn có</span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={submitSurvey}
+                      className="inline-flex items-center justify-center gap-2 bg-[var(--color-primary)] text-black border-[3px] border-black px-5 py-3 font-black uppercase tracking-wide shadow-[4px_4px_0_#000] hover:bg-white active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+                    >
+                      <Check className="w-5 h-5 stroke-[4px]" />
+                      Gửi phản hồi
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="pt-10 border-t-[4px] border-black">
@@ -1592,6 +1817,17 @@ Yêu cầu:
                 Dưới đây là thông tin tổng hợp về điểm chuẩn, phương thức xét tuyển và học phí của các trường bạn đã chọn.
               </p>
 
+              {autoSaved && (
+                <div className="flex items-center gap-3 mb-8 sm:mb-10 bg-white p-3 sm:p-4 border-[3px] border-black shadow-[4px_4px_0_#000]">
+                  <div className="w-8 h-8 bg-green-pop border-[3px] border-black flex items-center justify-center flex-shrink-0">
+                    <Check className="w-4 h-4 stroke-[4px]" />
+                  </div>
+                  <p className="text-xs sm:text-sm font-black text-black/80 leading-relaxed">
+                    Hồ sơ đã được lưu tự động. Bạn không cần bấm lưu thủ công.
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-6 sm:space-y-10 mb-10 sm:mb-12">
                 {uniDetails.map((detail, index) => (
                   <div
@@ -1623,6 +1859,7 @@ Yêu cầu:
                               href={detail.uni.url}
                               target="_blank"
                               rel="noopener noreferrer"
+                              onClick={recordFirstUniversityOpen}
                               className="text-xs sm:text-sm font-black text-black bg-white px-3 sm:px-4 py-2 border-[3px] border-black inline-flex items-center max-w-full shadow-[4px_4px_0_#000] hover:bg-orange-pop active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
                             >
                               <span className="break-all min-w-0">Nguồn: {detail.uni.url}</span>
@@ -1650,14 +1887,14 @@ Yêu cầu:
                 <div className="flex-1 text-center lg:text-left lg:ml-6">
                   <h4 className="font-black text-2xl sm:text-3xl text-black mb-2 uppercase tracking-tight">Đã sẵn sàng?</h4>
                   <p className="text-sm sm:text-lg font-bold text-black uppercase bg-white inline-block px-3 py-1 border-[2px] border-black">
-                    Bắt đầu theo dõi điểm số và lên kế hoạch học tập ngay hôm nay.
+                    Hồ sơ đã lưu tự động. Bấm để sang trang học tập và theo dõi điểm số.
                   </p>
                 </div>
                 <button
                   onClick={finishGuidance}
                   className="flex items-center justify-center px-6 sm:px-10 py-4 sm:py-5 font-black text-black text-base sm:text-xl uppercase bg-orange-pop border-[4px] border-black shadow-[6px_6px_0_#000] active:translate-x-[6px] active:translate-y-[6px] active:shadow-none hover:bg-white transition-all whitespace-nowrap w-full lg:w-auto"
                 >
-                  Bắt đầu hành trình
+                  Sang trang học tập
                   <ArrowRight className="w-6 h-6 ml-3 stroke-[4px]" />
                 </button>
               </div>

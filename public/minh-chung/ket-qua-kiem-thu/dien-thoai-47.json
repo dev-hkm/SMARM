@@ -1,0 +1,198 @@
+{
+  "round": "2-mobile",
+  "base": "https://smarm.pages.dev",
+  "total": 47,
+  "passed": 47,
+  "checks": [
+    {
+      "label": "home mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "home mobile renders",
+      "pass": true
+    },
+    {
+      "label": "home mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "auth mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "welcome mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "register mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "test mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "mobile test answer works",
+      "pass": true
+    },
+    {
+      "label": "test music autoplays after first tap",
+      "pass": true
+    },
+    {
+      "label": "music toggle mutes and saves preference",
+      "pass": true
+    },
+    {
+      "label": "music toggle resumes playback",
+      "pass": true
+    },
+    {
+      "label": "mobile dev fill works",
+      "pass": true
+    },
+    {
+      "label": "test mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "Tư vấn mobile renders",
+      "pass": true
+    },
+    {
+      "label": "Tư vấn mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "Tư vấn mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "Học tập mobile renders",
+      "pass": true
+    },
+    {
+      "label": "Học tập mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "Học tập mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "Lộ trình mobile renders",
+      "pass": true
+    },
+    {
+      "label": "Lộ trình mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "Lộ trình mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "Góc nhìn mobile renders",
+      "pass": true
+    },
+    {
+      "label": "Góc nhìn mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "Góc nhìn mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "So sánh mobile renders",
+      "pass": true
+    },
+    {
+      "label": "So sánh mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "So sánh mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "Smarm AI mobile renders",
+      "pass": true
+    },
+    {
+      "label": "Smarm AI mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "Smarm AI mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "chat mobile back button works",
+      "pass": true
+    },
+    {
+      "label": "Cài đặt mobile renders",
+      "pass": true
+    },
+    {
+      "label": "Cài đặt mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "Cài đặt mobile: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "stored AI mode survives reload",
+      "pass": true
+    },
+    {
+      "label": "retake confirmation appears",
+      "pass": true
+    },
+    {
+      "label": "retake can be cancelled",
+      "pass": true
+    },
+    {
+      "label": "retake clears test results",
+      "pass": true
+    },
+    {
+      "label": "retake keeps planner todos",
+      "pass": true
+    },
+    {
+      "label": "retake keeps AI attitude mode",
+      "pass": true
+    },
+    {
+      "label": "retake keeps music preference",
+      "pass": true
+    },
+    {
+      "label": "retake flow: no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "mobile logout clears account",
+      "pass": true
+    },
+    {
+      "label": "mobile logout keeps music preference",
+      "pass": true
+    },
+    {
+      "label": "auth after logout mobile: no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "logout mobile: no runtime errors",
+      "pass": true
+    }
+  ],
+  "console_errors": 0,
+  "runtime_errors": 0
+}

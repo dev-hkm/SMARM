@@ -278,9 +278,9 @@ export default function Home() {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="text-xl md:text-2xl text-black mb-12 font-bold max-w-2xl leading-relaxed lg:leading-loose px-4 uppercase tracking-tight"
           >
-            Hệ thống đánh giá năng lực và{" "}
-            <span className="bg-[var(--color-yellow-pop)] border-b-[3px] border-black pb-1">định hướng sự nghiệp</span>{" "}
-            cá nhân hóa dựa trên dữ liệu học tập thực tế.
+            ASTRA – Hệ thống khám phá năng lực và{" "}
+            <span className="bg-[var(--color-yellow-pop)] border-b-[3px] border-black pb-1">định hướng nghề nghiệp</span>{" "}
+            dựa trên bài test Holland và kết quả học tập thực tế.
           </motion.p>
 
           <motion.div
@@ -523,6 +523,12 @@ export default function Home() {
               className="text-sm font-black uppercase hover:text-[var(--color-primary)] transition-colors border-b-2 border-transparent hover:border-[var(--color-primary)]"
             >
               Phương pháp
+            </Link>
+            <Link
+              to="/minh-chung"
+              className="text-sm font-black uppercase hover:text-[var(--color-primary)] transition-colors border-b-2 border-transparent hover:border-[var(--color-primary)]"
+            >
+              Minh chứng
             </Link>
             <span
               onClick={() => setActivePolicyModal('terms')}

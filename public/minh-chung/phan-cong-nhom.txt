@@ -1,0 +1,15 @@
+PHÂN CÔNG NHÓM DỰ ÁN ASTRA
+Thời gian thực hiện: 02/10/2026 - 11/11/2026
+
+Nhóm trưởng: Trần Hoàng Khánh Minh
+- Nghiên cứu lý thuyết Holland, xây dựng bộ câu hỏi và cách tính điểm.
+- Thiết kế, lập trình sản phẩm; tích hợp dữ liệu ngành, trường.
+- Kiểm thử, sửa lỗi và hoàn thiện hồ sơ dự thi.
+
+Thành viên: Trần Ngọc Huyền Minh
+- Tham gia lên ý tưởng, góp ý tính năng và trải nghiệm sử dụng.
+- Góp ý nội dung poster, báo cáo.
+- Kiểm thử các luồng chính trên máy tính và điện thoại.
+- Xây dựng kịch bản và thuyết trình sản phẩm trước hội đồng.
+
+Ghi chú: Hai thành viên cùng trao đổi, thống nhất nội dung trong quá trình làm việc nhóm.

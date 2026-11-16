@@ -1,0 +1,91 @@
+{
+  "total": 21,
+  "passed": 21,
+  "results": [
+    {
+      "label": "register A",
+      "pass": true
+    },
+    {
+      "label": "seed A server data",
+      "pass": true
+    },
+    {
+      "label": "register B (cookie switches)",
+      "pass": true
+    },
+    {
+      "label": "seed B server data",
+      "pass": true
+    },
+    {
+      "label": "dashboard adopts B account",
+      "pass": true
+    },
+    {
+      "label": "no A aspirations after switch",
+      "pass": true
+    },
+    {
+      "label": "no A answers after switch",
+      "pass": true
+    },
+    {
+      "label": "no A chat after switch",
+      "pass": true
+    },
+    {
+      "label": "music preference survives switch",
+      "pass": true
+    },
+    {
+      "label": "dashboard renders after switch",
+      "pass": true
+    },
+    {
+      "label": "cross-account sync rejected (409)",
+      "pass": true
+    },
+    {
+      "label": "logout flag blocks auto sign-in",
+      "pass": true
+    },
+    {
+      "label": "login B again",
+      "pass": true
+    },
+    {
+      "label": "logout redirects to /auth",
+      "pass": true
+    },
+    {
+      "label": "logout clears account identity",
+      "pass": true
+    },
+    {
+      "label": "logout clears account data",
+      "pass": true
+    },
+    {
+      "label": "logout keeps music preference",
+      "pass": true
+    },
+    {
+      "label": "logout marks device logged out",
+      "pass": true
+    },
+    {
+      "label": "no silent re-login after logout",
+      "pass": true
+    },
+    {
+      "label": "server session cleared on logout",
+      "pass": true
+    },
+    {
+      "label": "expired session clears stale identity",
+      "pass": true
+    }
+  ],
+  "errors": []
+}

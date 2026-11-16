@@ -1,0 +1,186 @@
+{
+  "round": "1",
+  "base": "https://smarm.pages.dev",
+  "total": 44,
+  "passed": 44,
+  "checks": [
+    {
+      "label": "home renders",
+      "pass": true
+    },
+    {
+      "label": "home no horizontal overflow",
+      "pass": true
+    },
+    {
+      "label": "home no errors",
+      "pass": true
+    },
+    {
+      "label": "home saw CTA",
+      "pass": true
+    },
+    {
+      "label": "register lands on welcome",
+      "pass": true
+    },
+    {
+      "label": "welcome greets the new user",
+      "pass": true
+    },
+    {
+      "label": "register/auth no errors",
+      "pass": true
+    },
+    {
+      "label": "test shows first question",
+      "pass": true
+    },
+    {
+      "label": "answer option works",
+      "pass": true
+    },
+    {
+      "label": "dev fill answers all questions",
+      "pass": true
+    },
+    {
+      "label": "finish test opens dashboard",
+      "pass": true
+    },
+    {
+      "label": "test flow no errors",
+      "pass": true
+    },
+    {
+      "label": "Tư vấn renders content",
+      "pass": true
+    },
+    {
+      "label": "Tư vấn no horizontal overflow (desktop)",
+      "pass": true
+    },
+    {
+      "label": "Tư vấn no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "Học tập renders content",
+      "pass": true
+    },
+    {
+      "label": "Học tập no horizontal overflow (desktop)",
+      "pass": true
+    },
+    {
+      "label": "Học tập no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "Lộ trình renders content",
+      "pass": true
+    },
+    {
+      "label": "Lộ trình no horizontal overflow (desktop)",
+      "pass": true
+    },
+    {
+      "label": "Lộ trình no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "planner can add a todo",
+      "pass": true
+    },
+    {
+      "label": "Góc nhìn renders content",
+      "pass": true
+    },
+    {
+      "label": "Góc nhìn no horizontal overflow (desktop)",
+      "pass": true
+    },
+    {
+      "label": "Góc nhìn no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "So sánh renders content",
+      "pass": true
+    },
+    {
+      "label": "So sánh no horizontal overflow (desktop)",
+      "pass": true
+    },
+    {
+      "label": "So sánh no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "compare loads saved aspiration",
+      "pass": true
+    },
+    {
+      "label": "Smarm AI renders content",
+      "pass": true
+    },
+    {
+      "label": "Smarm AI no horizontal overflow (desktop)",
+      "pass": true
+    },
+    {
+      "label": "Smarm AI no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "chat send button enables",
+      "pass": true
+    },
+    {
+      "label": "chat receives AI reply",
+      "pass": true
+    },
+    {
+      "label": "chat no new console errors",
+      "pass": true
+    },
+    {
+      "label": "chat can return to dashboard",
+      "pass": true
+    },
+    {
+      "label": "Cài đặt renders content",
+      "pass": true
+    },
+    {
+      "label": "Cài đặt no horizontal overflow (desktop)",
+      "pass": true
+    },
+    {
+      "label": "Cài đặt no runtime errors",
+      "pass": true
+    },
+    {
+      "label": "settings saves AI attitude mode",
+      "pass": true
+    },
+    {
+      "label": "settings shows test status",
+      "pass": true
+    },
+    {
+      "label": "logout returns to auth",
+      "pass": true
+    },
+    {
+      "label": "logout clears account data",
+      "pass": true
+    },
+    {
+      "label": "logout no runtime errors",
+      "pass": true
+    }
+  ],
+  "console_errors": 0,
+  "runtime_errors": 0
+}

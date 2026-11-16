@@ -11,6 +11,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { METHOD_UPDATED_AT, METHOD_VERSION } from "../data/version";
 
 const Section = ({
   icon,
@@ -179,52 +180,78 @@ export default function Method() {
           </Section>
 
           <Section icon={<BookOpen className="w-5 h-5 stroke-[3px]" />} title="5. So với các công cụ đã có">
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
+            <p>
+              Bảng so sánh dưới đây trả lời một câu hỏi duy nhất: <strong>điểm mới của Astra nằm ở đâu</strong>
+              . Ký hiệu: <span className="font-black">●</span> có đầy đủ,{" "}
+              <span className="font-black">◐</span> có một phần, <span className="font-black">○</span> không
+              có.
+            </p>
+            <div className="overflow-x-auto -mx-1">
+              <table className="w-full min-w-[640px] border-collapse text-xs md:text-sm">
                 <thead>
                   <tr className="bg-black text-white">
-                    <th className="border-[3px] border-black px-3 py-2 text-left font-black uppercase">
-                      Công cụ
+                    <th className="border-[3px] border-black px-2 py-2 text-left font-black uppercase">
+                      Tiêu chí
                     </th>
-                    <th className="border-[3px] border-black px-3 py-2 text-left font-black uppercase">
-                      Điểm khác
+                    <th className="border-[3px] border-black px-2 py-2 text-center font-black uppercase bg-[var(--color-primary)] text-black">
+                      Astra
+                    </th>
+                    <th className="border-[3px] border-black px-2 py-2 text-center font-black uppercase">
+                      O*NET Interest Profiler
+                    </th>
+                    <th className="border-[3px] border-black px-2 py-2 text-center font-black uppercase">
+                      Strong Interest Inventory
+                    </th>
+                    <th className="border-[3px] border-black px-2 py-2 text-center font-black uppercase">
+                      16Personalities
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td className="border-[3px] border-black px-3 py-2 align-top font-black">
-                      O*NET Interest Profiler
-                    </td>
-                    <td className="border-[3px] border-black px-3 py-2 align-top">
-                      Cùng khung RIASEC, miễn phí, phát triển cho thị trường lao động Mỹ. Astra Việt hóa câu
-                      hỏi, gắn với hồ sơ học tập – nguyện vọng và gợi ý ngành, trường trong nước.
-                    </td>
-                  </tr>
-                  <tr className="bg-[var(--color-background)]">
-                    <td className="border-[3px] border-black px-3 py-2 align-top font-black">
-                      MBTI / 16Personalities
-                    </td>
-                    <td className="border-[3px] border-black px-3 py-2 align-top">
-                      Đo kiểu tính cách theo bốn cặp, không phải sở thích nghề nghiệp. Astra không dùng MBTI
-                      và không thay thế các công cụ đó.
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border-[3px] border-black px-3 py-2 align-top font-black">
-                      Ứng dụng hướng nghiệp khác
-                    </td>
-                    <td className="border-[3px] border-black px-3 py-2 align-top">
-                      Astra công khai công thức, giới hạn và để kết quả do công thức cố định tính thay vì
-                      phụ thuộc AI.
-                    </td>
-                  </tr>
+                  {[
+                    ["Nền tảng lý thuyết RIASEC (Holland)", "●", "●", "●", "○"],
+                    ["Câu hỏi tiếng Việt cho học sinh THPT", "●", "○", "○", "◐"],
+                    ["Miễn phí, không cần thẻ thanh toán", "●", "●", "○", "●"],
+                    ["Dữ liệu ngành – trường & tuyển sinh Việt Nam", "●", "○", "○", "○"],
+                    ["Chạy trên điện thoại, cài như ứng dụng (PWA)", "●", "○", "○", "◐"],
+                    ["Lộ trình học tập và gợi ý bước tiếp theo", "●", "○", "◐", "○"],
+                  ].map((row, index) => (
+                    <tr key={row[0]} className={index % 2 === 1 ? "bg-[var(--color-background)]" : ""}>
+                      <td className="border-[3px] border-black px-2 py-2 align-top font-black">{row[0]}</td>
+                      {row.slice(1).map((cell, cellIndex) => (
+                        <td
+                          key={cellIndex}
+                          className={`border-[3px] border-black px-2 py-2 text-center align-middle text-lg font-black ${
+                            cellIndex === 0 ? "bg-yellow-pop/40" : ""
+                          }`}
+                        >
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
+            <ul className="text-xs md:text-sm space-y-1.5 pt-1">
+              <li>
+                <strong>Điểm mới:</strong> ghép trắc nghiệm RIASEC với hồ sơ học tập và dữ liệu tuyển sinh
+                trong nước, chạy miễn phí trên điện thoại, kết quả do công thức cố định tính thay vì để AI
+                tự quyết.
+              </li>
+              <li>
+                <strong>Điểm chưa bằng:</strong> Strong Interest Inventory có bộ chuẩn hóa và tư vấn viên
+                được cấp phép; Astra chưa có cả hai, nên chỉ dùng để tự khám phá, không dùng thay thế tư vấn
+                chuyên môn.
+              </li>
+              <li>
+                <strong>16Personalities</strong> đo kiểu tính cách, không đo sở thích nghề nghiệp; Astra
+                không dùng MBTI và không so sánh trực tiếp kết quả hai bên.
+              </li>
+            </ul>
             <p className="text-xs text-black/60">
-              Astra không liên kết chính thức với O*NET, 16Personalities hay bất kỳ tổ chức nào được nhắc
-              trên.
+              Astra không liên kết chính thức với O*NET, Stanford / CPP (Strong), 16Personalities hay bất kỳ
+              tổ chức nào được nhắc trên.
             </p>
           </Section>
 
@@ -271,7 +298,12 @@ export default function Method() {
                 ).
               </li>
             </ul>
-            <p className="text-xs text-black/60">Bộ câu hỏi Astra v1.0 · Cập nhật 11/2026.</p>
+            <p className="text-xs text-black/60">
+              Bộ câu hỏi Astra {METHOD_VERSION} · Cập nhật {METHOD_UPDATED_AT} ·{" "}
+              <Link to="/minh-chung" className="underline decoration-[2px] underline-offset-2 hover:bg-yellow-pop">
+                Xem minh chứng kiểm thử
+              </Link>
+            </p>
           </Section>
         </div>
 
@@ -292,7 +324,10 @@ export default function Method() {
         </div>
 
         <footer className="py-8 text-center text-xs font-black uppercase tracking-widest text-black/40">
-          Astra · Phương pháp công khai · 2026
+          Astra · Phương pháp công khai {METHOD_VERSION} · {METHOD_UPDATED_AT} ·{" "}
+          <Link to="/minh-chung" className="underline decoration-[2px] underline-offset-2 hover:text-black">
+            Minh chứng
+          </Link>
         </footer>
       </main>
     </div>

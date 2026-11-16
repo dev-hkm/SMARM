@@ -24,6 +24,7 @@ import { api } from '../lib/api';
 import { ensureSessionUser, readStoredUser, USER_KEY } from '../lib/userSession';
 import { useBackgroundMusic } from '../lib/useBackgroundMusic';
 import { GROUP_MAX_SCORE, SCALE_MAX, SCALE_MIN, normalizeGroupScore, writeAnswers } from '../lib/holland';
+import { INSTRUMENT_VERSION, readPreSurvey, writePreSurvey } from '../lib/instruments';
 
 const ACCENTS = [
   'var(--color-orange-pop)',
@@ -75,6 +76,7 @@ export default function Test() {
   const { muted, playing, toggle: toggleMusic } = useBackgroundMusic();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [showBaseline, setShowBaseline] = useState(() => readPreSurvey() === null);
   const [devClickCount, setDevClickCount] = useState(0);
   const [checkpoint, setCheckpoint] = useState<{
     category: GroupKey;
@@ -219,6 +221,17 @@ export default function Test() {
     }
   };
 
+  const submitBaseline = (value: number | null) => {
+    writePreSurvey({
+      version: INSTRUMENT_VERSION,
+      at: new Date().toISOString(),
+      value,
+      skipped: value === null,
+    });
+    setShowBaseline(false);
+    api.syncUserData().catch((error) => console.error('Failed to sync baseline:', error));
+  };
+
   const finishTest = async () => {
     // Ensure all questions are answered
     if (Object.keys(answers).length < questions.length) {
@@ -252,6 +265,46 @@ export default function Test() {
 
   return (
     <div className="relative min-h-screen bg-brutal-paper flex flex-col font-sans overflow-hidden">
+      {showBaseline && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="w-full max-w-lg bg-white border-[4px] border-black shadow-[8px_8px_0_#000] p-5 sm:p-7"
+          >
+            <p className="text-[10px] font-black uppercase tracking-widest text-black/50 mb-2">
+              Một câu trước khi bắt đầu · không bắt buộc
+            </p>
+            <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight leading-tight mb-4">
+              Trước khi dùng Astra, bạn đã biết rõ ngành mình muốn học chưa?
+            </h2>
+            <p className="text-xs sm:text-sm font-bold text-black/70 mb-4">
+              Câu trả lời được dùng để đo thay đổi trước – sau, không kèm thông tin cá nhân.
+            </p>
+            <div className="grid grid-cols-5 gap-2 mb-3">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  onClick={() => submitBaseline(value)}
+                  className="py-3 border-[3px] border-black bg-white font-black text-lg shadow-[3px_3px_0_#000] hover:bg-[var(--color-yellow-pop)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-between text-[10px] sm:text-xs font-black uppercase tracking-wide text-black/60 mb-5">
+              <span>1 · Chưa rõ</span>
+              <span>5 · Rất rõ</span>
+            </div>
+            <button
+              onClick={() => submitBaseline(null)}
+              className="text-xs font-black uppercase tracking-wide underline decoration-[2px] underline-offset-2 hover:bg-[var(--color-yellow-pop)] px-1"
+            >
+              Bỏ qua câu này
+            </button>
+          </motion.div>
+        </div>
+      )}
       {/* Animated backdrop */}
       <div
         className={`pointer-events-none absolute inset-0 overflow-hidden ${checkpoint ? 'test-ambience-paused' : ''}`}

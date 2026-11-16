@@ -1,0 +1,13 @@
+SỐ LIỆU VẬN HÀNH SẢN PHẨM ASTRA
+Số liệu ghi nhận đến ngày 11/11/2026
+
+- Trường đại học trong dữ liệu: 132
+- Ngành đào tạo trong dữ liệu: 120
+- Câu hỏi trắc nghiệm Holland: 60
+- Tài khoản đã tạo: 193
+- Tài khoản hoàn thành bài trắc nghiệm: 125 (65%)
+- Tài khoản đã đặt mục tiêu ngành, trường: 59 (31%)
+- Kịch bản kiểm thử đạt: 91/91
+- Kiểm thử cô lập dữ liệu đạt: 21/21
+
+Nguồn: cơ sở dữ liệu vận hành và nhật ký kiểm thử của sản phẩm.

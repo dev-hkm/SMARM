@@ -1,0 +1,25 @@
+NHẬT KÝ KIỂM THỬ SẢN PHẨM ASTRA
+Ngày thực hiện: 11/11/2026
+Người thực hiện: Trần Hoàng Khánh Minh, Trần Ngọc Huyền Minh
+
+1. Kiểm thử trên máy tính
+- Số kịch bản: 44
+- Nội dung: đăng ký, đăng nhập, làm bài 60 câu, xem kết quả Holland, gợi ý ngành, so sánh trường, góc nhìn, lộ trình, cài đặt, đăng xuất.
+- Kết quả: 44/44 đạt; 0 lỗi chặn luồng sử dụng.
+
+2. Kiểm thử trên điện thoại
+- Số kịch bản: 47
+- Nội dung: các luồng như trên, kiểm tra thêm bố cục, thanh điều hướng, cuộn trang và bàn phím trên màn hình nhỏ.
+- Kết quả: 47/47 đạt; không tràn ngang, không lỗi giao diện.
+
+3. Kiểm tra cô lập dữ liệu giữa các tài khoản
+- Số trường hợp: 21
+- Nội dung: tạo hai tài khoản, ghi dữ liệu riêng, đăng nhập qua lại và kiểm tra kết quả, mục tiêu, lịch sử trò chuyện của từng tài khoản.
+- Kết quả: 21/21 đạt; không tài khoản nào đọc được dữ liệu của tài khoản khác.
+
+4. Lỗi đã ghi nhận và xử lý
+- Nhóm ngành bị trùng sau bài trắc nghiệm: đã sửa cách gộp nhóm và kiểm tra lại.
+- Menu trên điện thoại chiếm nhiều chỗ: đã thu gọn.
+- Một số ảnh trường hiển thị sai hoặc bị lỗi: đã thay bằng ảnh từ nguồn chính thức.
+
+Ghi chú: Kết quả chi tiết của từng kịch bản được lưu trong thư mục ket-qua-kiem-thu.
