@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { AiMarkdown } from "../../components/AiMarkdown";
 import { questions } from "../../data/questions";
@@ -16,9 +17,12 @@ import {
   Loader2,
   ArrowRight,
   RotateCcw,
+  BarChart3,
+  Info,
 } from "lucide-react";
 import { api } from "../../lib/api";
 import { writeJson } from "../../lib/localData";
+import { readAnswers, normalizeGroupScore, GROUP_MAX_SCORE, type HollandGroup } from "../../lib/holland";
 import { useToast } from "../../components/Toast";
 import {
   buildUniversitySearchRequest,
@@ -369,6 +373,15 @@ const CAREER_RESULT_LIMIT = 24;
 // Rank of the Holland group decides how many careers it contributes.
 const CAREER_RESULT_WEIGHTS = [12, 8, 4];
 
+const GROUP_COLORS: Record<HollandGroup, string> = {
+  R: "var(--color-orange-pop)",
+  I: "var(--color-cyan-pop)",
+  A: "var(--color-pink-pop)",
+  S: "var(--color-green-pop)",
+  E: "var(--color-purple-pop)",
+  C: "var(--color-yellow-pop)",
+};
+
 const careerKey = (career: string) =>
   career
     .toLowerCase()
@@ -507,12 +520,7 @@ export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
   }, []);
 
   useEffect(() => {
-    const answersData = localStorage.getItem("smarm_answers");
-    if (answersData) {
-      try {
-        setAnswers(JSON.parse(answersData));
-      } catch { /* ignore */ }
-    }
+    setAnswers(readAnswers());
 
     const saved = loadGuidanceResults();
     if (saved && saved.uniDetails && saved.uniDetails.length > 0) {
@@ -553,7 +561,11 @@ export default function GuidanceTab({ onComplete }: GuidanceTabProps) {
     });
 
     const sortedScores = Object.entries(scores)
-      .map(([category, score]) => ({ category, score }))
+      .map(([category, score]) => ({
+        category,
+        score,
+        normalized: normalizeGroupScore(score),
+      }))
       .sort((a, b) => b.score - a.score);
 
     const top3 = sortedScores.slice(0, 3);
@@ -1159,9 +1171,15 @@ Yêu cầu:
                       }`}>
                         {item.category}
                       </div>
-                      <span className="text-sm font-black text-black bg-white px-3 py-1 border-[3px] border-black shadow-[2px_2px_0_#000]">
-                        {item.score}/40 điểm
-                      </span>
+                      <div className="text-right bg-white px-3 py-1 border-[3px] border-black shadow-[2px_2px_0_#000]">
+                        <span className="block text-xl font-black leading-none">
+                          {item.normalized}
+                          <span className="text-xs align-top">/100</span>
+                        </span>
+                        <span className="block text-[10px] font-black uppercase tracking-wide text-black/50 mt-1">
+                          {item.score}/{GROUP_MAX_SCORE} điểm thô
+                        </span>
+                      </div>
                     </div>
                     <h3 className="font-black text-xl text-black mb-4 pb-2 border-b-[3px] border-black uppercase tracking-tight leading-tight">
                       {categoryNames[item.category]}
@@ -1171,6 +1189,93 @@ Yêu cầu:
                     </p>
                   </div>
                 ))}
+              </div>
+
+              <div className="bg-white border-[4px] border-black shadow-[6px_6px_0_#000] p-4 sm:p-6 md:p-8 mb-10">
+                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
+                  <h2 className="text-2xl md:text-3xl font-black text-black uppercase tracking-tight flex items-center">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-cyan-pop border-[3px] border-black flex items-center justify-center mr-3 shadow-[4px_4px_0_#000] flex-shrink-0">
+                      <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-black stroke-[3px]" />
+                    </div>
+                    Phổ điểm sáu nhóm
+                  </h2>
+                  <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-black/50">
+                    Thô 10–50 · quy đổi 0–100
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  {results.scores.map((item) => (
+                    <div key={item.category}>
+                      <div className="flex items-center justify-between gap-3 mb-1">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className="w-7 h-7 border-[2px] border-black flex items-center justify-center text-xs font-black flex-shrink-0"
+                            style={{ backgroundColor: GROUP_COLORS[item.category as HollandGroup] }}
+                          >
+                            {item.category}
+                          </span>
+                          <span className="text-xs sm:text-sm font-black uppercase tracking-tight truncate">
+                            {categoryNames[item.category]}
+                          </span>
+                        </div>
+                        <span className="text-xs sm:text-sm font-black flex-shrink-0">
+                          {item.normalized}/100
+                        </span>
+                      </div>
+                      <div className="h-5 border-[3px] border-black bg-[var(--color-background)]">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${item.normalized}%` }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                          className="h-full"
+                          style={{ backgroundColor: GROUP_COLORS[item.category as HollandGroup] }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 text-xs font-bold leading-relaxed text-black/60">
+                  Điểm 50 là mức trung tính. Thang 0–100 chỉ so sánh sáu nhóm trong cùng một lần làm bài,
+                  không phải điểm phần trăm so với người khác.
+                </p>
+              </div>
+
+              <div className="bg-[var(--color-background)] border-[4px] border-black p-5 md:p-7 shadow-[6px_6px_0_#000] mb-12">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-yellow-pop border-[3px] border-black flex items-center justify-center flex-shrink-0">
+                    <Info className="w-5 h-5 text-black stroke-[3px]" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-lg md:text-xl uppercase tracking-tight mb-3">
+                      Cách tính &amp; giới hạn
+                    </h3>
+                    <ul className="space-y-2 text-sm font-bold leading-relaxed text-black/80 list-disc pl-4">
+                      <li>
+                        Mỗi nhóm có 10 câu, trả lời theo thang 1–5. Điểm thô nằm trong 10–50 và được quy
+                        đổi 0–100 theo công thức (điểm thô − 10) ÷ 40 × 100.
+                      </li>
+                      <li>
+                        Ba nhóm cao nhất tạo mã ba chữ. Gợi ý ngành lấy lần lượt 12, 8 và 4 ngành từ ba nhóm
+                        dẫn đầu, sau đó lọc trùng.
+                      </li>
+                      <li>
+                        Đây là bảng tự khai, không phải chẩn đoán tâm lý hay dự báo chắc chắn về nghề nghiệp.
+                        Kết quả có thể thay đổi theo tâm trạng và cách hiểu câu hỏi.
+                      </li>
+                      <li>
+                        Điểm chuẩn, học phí và ngành mở thay đổi theo từng năm; luôn kiểm tra lại trên website
+                        chính thức của trường.
+                      </li>
+                    </ul>
+                    <Link
+                      to="/phuong-phap"
+                      className="inline-flex items-center gap-2 mt-4 text-sm font-black uppercase tracking-wide border-b-[3px] border-black hover:bg-black hover:text-white transition-colors px-1 py-0.5"
+                    >
+                      Xem phương pháp đầy đủ
+                      <ArrowRight className="w-4 h-4 stroke-[3px]" />
+                    </Link>
+                  </div>
+                </div>
               </div>
 
               <div className="pt-10 border-t-[4px] border-black">

@@ -23,6 +23,7 @@ import { useToast } from '../components/Toast';
 import { api } from '../lib/api';
 import { ensureSessionUser, readStoredUser, USER_KEY } from '../lib/userSession';
 import { useBackgroundMusic } from '../lib/useBackgroundMusic';
+import { GROUP_MAX_SCORE, SCALE_MAX, SCALE_MIN, normalizeGroupScore, writeAnswers } from '../lib/holland';
 
 const ACCENTS = [
   'var(--color-orange-pop)',
@@ -33,13 +34,13 @@ const ACCENTS = [
   'var(--color-yellow-pop)',
 ];
 
-const OPTION_STYLES = [
-  { color: 'var(--color-red-pop)', Icon: X },
-  { color: 'var(--color-orange-pop)', Icon: Minus },
-  { color: 'var(--color-yellow-pop)', Icon: Circle },
-  { color: 'var(--color-cyan-pop)', Icon: Plus },
-  { color: 'var(--color-green-pop)', Icon: Flame },
-];
+const OPTION_STYLES: Record<number, { color: string; Icon: typeof X }> = {
+  1: { color: 'var(--color-red-pop)', Icon: X },
+  2: { color: 'var(--color-orange-pop)', Icon: Minus },
+  3: { color: 'var(--color-yellow-pop)', Icon: Circle },
+  4: { color: 'var(--color-cyan-pop)', Icon: Plus },
+  5: { color: 'var(--color-green-pop)', Icon: Flame },
+};
 
 const getStage = (percent: number) => {
   if (percent < 15) return { label: 'Khởi động thôi!', Icon: Zap };
@@ -61,14 +62,12 @@ const GROUP_META: Record<GroupKey, { name: string; color: string }> = {
   C: { name: 'Nghiệp vụ', color: 'var(--color-yellow-pop)' },
 };
 
-const GROUP_MAX_SCORE = 40;
-
 const OPTIONS = [
-  { value: 0, label: 'Hoàn toàn không giống tôi' },
-  { value: 1, label: 'Ít giống tôi' },
-  { value: 2, label: 'Bình thường / Phân vân' },
-  { value: 3, label: 'Khá giống tôi' },
-  { value: 4, label: 'Rất giống tôi' },
+  { value: 1, label: 'Hoàn toàn không giống tôi' },
+  { value: 2, label: 'Ít giống tôi' },
+  { value: 3, label: 'Bình thường / Phân vân' },
+  { value: 4, label: 'Khá giống tôi' },
+  { value: 5, label: 'Rất giống tôi' },
 ];
 
 export default function Test() {
@@ -226,7 +225,7 @@ export default function Test() {
       showToast('Vui lòng trả lời tất cả các câu hỏi trước khi hoàn thành!', 'info');
       return;
     }
-    localStorage.setItem('smarm_answers', JSON.stringify(answers));
+    writeAnswers(answers);
     try {
       await api.syncUserData();
     } catch (e) {
@@ -242,8 +241,7 @@ export default function Test() {
     if (newCount >= 8) {
       const autoAnswers: Record<string, number> = {};
       questions.forEach(q => {
-        // Random score between 0 and 4
-        autoAnswers[q.id] = Math.floor(Math.random() * 5);
+        autoAnswers[q.id] = SCALE_MIN + Math.floor(Math.random() * (SCALE_MAX - SCALE_MIN + 1));
       });
       setAnswers(autoAnswers);
       setCurrentIndex(questions.length - 1);
@@ -488,7 +486,7 @@ export default function Test() {
                           </motion.span>
                         ) : (
                           <span className="text-xs md:text-sm font-black text-black/30 pr-1">
-                            0{option.value + 1}
+                            0{option.value}
                           </span>
                         )}
                       </button>
@@ -584,16 +582,19 @@ export default function Test() {
                   </motion.div>
                 </div>
 
-                <div className="mt-4 flex items-end gap-2">
+                <div className="mt-4 flex flex-wrap items-end gap-2">
                   <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none">
                     {checkpoint.score}
                   </span>
-                  <span className="text-lg font-black text-black/50">/ {GROUP_MAX_SCORE} điểm</span>
+                  <span className="text-lg font-black text-black/50">/ {GROUP_MAX_SCORE} điểm thô</span>
+                  <span className="text-xs font-black uppercase bg-white px-2 py-1 border-[2px] border-black">
+                    ≈ {normalizeGroupScore(checkpoint.score)}/100
+                  </span>
                 </div>
                 <div className="mt-2 h-3 border-[2px] border-black bg-black/10">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${(checkpoint.score / GROUP_MAX_SCORE) * 100}%` }}
+                    animate={{ width: `${normalizeGroupScore(checkpoint.score)}%` }}
                     transition={{ duration: 0.7, ease: 'easeOut' }}
                     className="h-full"
                     style={{ backgroundColor: GROUP_META[checkpoint.category].color }}

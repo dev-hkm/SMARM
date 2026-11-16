@@ -4,6 +4,7 @@ import { User, LogOut, RotateCcw, Award, Settings as SettingsIcon, Heart, Gradua
 import { api } from '../../lib/api';
 import { clearAccountData, markLoggedOut } from '../../lib/userSession';
 import { readJson } from '../../lib/localData';
+import { clearAnswers } from '../../lib/holland';
 
 export default function SettingsTab() {
   const [user, setUser] = useState<any>(null);
@@ -44,8 +45,8 @@ export default function SettingsTab() {
   };
 
   const handleRetakeTest = async () => {
+    clearAnswers();
     [
-      'smarm_answers',
       'smarm_aspirations',
       'smarm_grades',
       'smarm_target_subjects',

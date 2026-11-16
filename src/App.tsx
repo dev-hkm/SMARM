@@ -9,6 +9,7 @@ import Auth from './pages/Auth';
 import Welcome from './pages/Welcome';
 import Test from './pages/Test';
 import Dashboard from './pages/Dashboard';
+import Method from './pages/Method';
 import { ToastProvider } from './components/Toast';
 import ErrorBoundary from './components/ErrorBoundary';
 
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/test" element={<Test />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/phuong-phap" element={<Method />} />
           </Routes>
         </BrowserRouter>
       </ToastProvider>

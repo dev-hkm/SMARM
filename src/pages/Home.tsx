@@ -517,7 +517,13 @@ export default function Home() {
           <p className="font-bold text-sm uppercase tracking-widest text-center">
             © 2026 Astra • Nền Tảng Theo Dõi & Định Hướng Tương Lai
           </p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap justify-center gap-6">
+            <Link
+              to="/phuong-phap"
+              className="text-sm font-black uppercase hover:text-[var(--color-primary)] transition-colors border-b-2 border-transparent hover:border-[var(--color-primary)]"
+            >
+              Phương pháp
+            </Link>
             <span
               onClick={() => setActivePolicyModal('terms')}
               className="text-sm font-black uppercase hover:text-[var(--color-primary)] cursor-pointer transition-colors border-b-2 border-transparent hover:border-[var(--color-primary)]"
