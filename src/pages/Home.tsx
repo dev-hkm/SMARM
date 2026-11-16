@@ -254,18 +254,18 @@ export default function Home() {
                 </motion.h1>
               ) : (
                 <motion.div
-                  key="smart-aim"
+                  key="ai-strategy"
                   initial={{ opacity: 0, scale: 1.1 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, y: -20 }}
                   className="text-5xl md:text-[7rem] font-black tracking-tighter text-black leading-none flex flex-wrap items-center justify-center gap-3 sm:gap-4 py-4"
                 >
                   <span className="bg-[var(--color-blue-pop)] px-6 sm:px-8 py-2 border-brutal shadow-[6px_6px_0_#000]">
-                    Smart
+                    AI
                   </span>
                   <span>+</span>
                   <span className="bg-[var(--color-primary)] px-6 sm:px-8 py-2 border-brutal shadow-[6px_6px_0_#000]">
-                    Aim
+                    Strategy
                   </span>
                 </motion.div>
               )}
