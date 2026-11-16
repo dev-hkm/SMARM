@@ -302,7 +302,7 @@ export default function Home() {
                 <CheckCircle2 className="w-4 h-4 stroke-[3px]" />
               </div>
               <div className="text-sm font-black uppercase tracking-tight">
-                Hơn <span className="text-[var(--color-secondary)]">150</span> học sinh đã tham gia
+                Hơn <span className="text-[var(--color-secondary)]">1.000</span> học sinh đã tham gia
               </div>
             </div>
           </motion.div>
