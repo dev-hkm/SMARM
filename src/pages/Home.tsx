@@ -137,7 +137,7 @@ export default function Home() {
       icon: <CheckCircle2 className="w-10 h-10 stroke-[3px]" />,
       title: "Bắt đầu & Đăng ký",
       content:
-        "Tạo tài khoản Smarm để cá nhân hóa lộ trình. Chúng tôi cần biết tên và khối thi mục tiêu của bạn.",
+        "Tạo tài khoản Astra để cá nhân hóa lộ trình. Chúng tôi cần biết tên và khối thi mục tiêu của bạn.",
       color: "bg-[var(--color-blue-pop)]"
     },
     {
@@ -163,7 +163,7 @@ export default function Home() {
     },
     {
       icon: <MessageSquare className="w-10 h-10 stroke-[3px]" />,
-      title: "Chat với Smarm AI",
+      title: "Chat với Astra AI",
       content:
         "Trò chuyện với trợ lý AI thông minh để nhận lời khuyên sâu sát về điểm số và định hướng tương lai.",
       color: "bg-[var(--color-blue-pop)]"
@@ -172,7 +172,7 @@ export default function Home() {
       icon: <Sparkles className="w-10 h-10 stroke-[3px]" />,
       title: "Lộ trình cá nhân",
       content:
-        "Smarm AI sẽ phân tích dữ liệu của bạn để đưa ra các gợi ý học tập và chọn trường tối ưu nhất.",
+        "Astra AI sẽ phân tích dữ liệu của bạn để đưa ra các gợi ý học tập và chọn trường tối ưu nhất.",
       color: "bg-[var(--color-yellow-pop)]"
     },
   ];
@@ -238,18 +238,18 @@ export default function Home() {
             <AnimatePresence mode="wait">
               {!showSecret ? (
                 <motion.h1
-                  key="smarm"
+                  key="astra"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   className="text-[5.5rem] sm:text-[8.5rem] md:text-[12rem] font-black tracking-tighter leading-[0.85] [-webkit-text-stroke:3px_black] md:[-webkit-text-stroke:5px_black]"
                   style={{ textShadow: "8px 8px 0 #000", paintOrder: "stroke fill" }}
                 >
-                  <span className="text-[var(--color-yellow-pop)]">S</span>
-                  <span className="text-[var(--color-blue-pop)]">m</span>
-                  <span className="text-[var(--color-red-pop)]">a</span>
+                  <span className="text-[var(--color-yellow-pop)]">A</span>
+                  <span className="text-[var(--color-blue-pop)]">s</span>
+                  <span className="text-[var(--color-red-pop)]">t</span>
                   <span className="text-[var(--color-purple-pop)]">r</span>
-                  <span className="text-[var(--color-green-pop)]">m</span>
+                  <span className="text-[var(--color-green-pop)]">a</span>
                   <span className="text-[var(--color-orange-pop)]">.</span>
                 </motion.h1>
               ) : (
@@ -371,13 +371,13 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Vì sao Smarm ra đời */}
+      {/* Vì sao Astra ra đời */}
       <section className="py-24 md:py-32 bg-[var(--color-primary)] relative overflow-hidden border-b-[3px] border-black">
         <div className="max-w-4xl mx-auto px-4 relative z-10">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-6xl font-black text-black mb-6 uppercase tracking-tighter" style={{ textShadow: "4px 4px 0 #fff" }}>
-                Vì sao Smarm ra đời?
+                Vì sao Astra ra đời?
               </h2>
             </div>
             <div className="bg-white brutal-card p-10 md:p-16">
@@ -389,7 +389,7 @@ export default function Home() {
                 đình, hoặc thiếu hiểu biết thực tế.
                 <br />
                 <br />
-                <span className="bg-[var(--color-yellow-pop)] px-2 border border-black shadow-[2px_2px_0_#000] text-black font-black">Smarm</span> ra
+                <span className="bg-[var(--color-yellow-pop)] px-2 border border-black shadow-[2px_2px_0_#000] text-black font-black">Astra</span> ra
                 đời với sứ mệnh trở thành người bạn đồng hành đáng tin cậy, cung
                 cấp công cụ đánh giá khoa học dựa trên lý thuyết Holland
                 (RIASEC), giúp các bạn trẻ thấu hiểu bản thân, khám phá thế mạnh
@@ -512,10 +512,10 @@ export default function Home() {
       <footer className="bg-black text-white py-12 border-t-[4px] border-black">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-4xl font-black tracking-tighter" style={{ textShadow: "2px 2px 0 var(--color-primary)" }}>
-            Smarm.
+            Astra.
           </div>
           <p className="font-bold text-sm uppercase tracking-widest text-center">
-            © 2026 Smarm • Nền Tảng Theo Dõi & Định Hướng Tương Lai
+            © 2026 Astra • Nền Tảng Theo Dõi & Định Hướng Tương Lai
           </p>
           <div className="flex gap-6">
             <span
@@ -561,12 +561,12 @@ export default function Home() {
                 {activePolicyModal === 'terms' ? (
                   <>
                     <p className="border-l-[4px] border-[var(--color-primary)] pl-3 text-black/70">
-                      Chào mừng bạn đến với Smarm. Khi bạn đăng ký tài khoản và sử dụng các tính năng trên hệ thống của chúng tôi, bạn mặc định đồng ý tuân thủ các điều khoản dịch vụ dưới đây.
+                      Chào mừng bạn đến với Astra. Khi bạn đăng ký tài khoản và sử dụng các tính năng trên hệ thống của chúng tôi, bạn mặc định đồng ý tuân thủ các điều khoản dịch vụ dưới đây.
                     </p>
                     <div>
                       <h4 className="font-black text-lg text-black uppercase mb-1">1. Mục đích của dịch vụ</h4>
                       <p className="text-black/85">
-                        Smarm cung cấp nền tảng số hỗ trợ học sinh trung học phổ thông định hướng nghề nghiệp thông qua bài kiểm tra trắc nghiệm Holland, lưu trữ điểm số, dự đoán xác suất trúng tuyển đại học và tương tác hỗ trợ học tập với AI Chatbot (Smarm AI). Mọi kết quả phân tích và lời khuyên của hệ thống đều mang tính chất tham khảo, không thay thế cho thông tin tuyển sinh chính thức từ Bộ Giáo dục và Đào tạo hay các trường Đại học.
+                        Astra cung cấp nền tảng số hỗ trợ học sinh trung học phổ thông định hướng nghề nghiệp thông qua bài kiểm tra trắc nghiệm Holland, lưu trữ điểm số, dự đoán xác suất trúng tuyển đại học và tương tác hỗ trợ học tập với AI Chatbot (Astra AI). Mọi kết quả phân tích và lời khuyên của hệ thống đều mang tính chất tham khảo, không thay thế cho thông tin tuyển sinh chính thức từ Bộ Giáo dục và Đào tạo hay các trường Đại học.
                       </p>
                     </div>
                     <div>
@@ -578,13 +578,13 @@ export default function Home() {
                     <div>
                       <h4 className="font-black text-lg text-black uppercase mb-1">3. Quyền sở hữu trí tuệ</h4>
                       <p className="text-black/85">
-                        Toàn bộ tài nguyên, giao diện thiết kế, cơ sở dữ liệu, biểu tượng, logo và các thuật toán tính toán/phân tích thuộc quyền sở hữu trí tuệ độc quyền của Smarm. Bạn không được phép sao chép, thương mại hóa hoặc can thiệp trái phép vào hệ thống.
+                        Toàn bộ tài nguyên, giao diện thiết kế, cơ sở dữ liệu, biểu tượng, logo và các thuật toán tính toán/phân tích thuộc quyền sở hữu trí tuệ độc quyền của Astra. Bạn không được phép sao chép, thương mại hóa hoặc can thiệp trái phép vào hệ thống.
                       </p>
                     </div>
                     <div>
                       <h4 className="font-black text-lg text-black uppercase mb-1">4. Giới hạn trách nhiệm pháp lý</h4>
                       <p className="text-black/85">
-                        Chúng tôi nỗ lực tối đa để cung cấp thuật toán chính xác và dữ liệu cập nhật. Tuy nhiên, Smarm không chịu bất kỳ trách nhiệm pháp lý nào đối với các quyết định học tập, lựa chọn nguyện vọng thi cử hoặc kết quả tuyển sinh cuối cùng của người dùng.
+                        Chúng tôi nỗ lực tối đa để cung cấp thuật toán chính xác và dữ liệu cập nhật. Tuy nhiên, Astra không chịu bất kỳ trách nhiệm pháp lý nào đối với các quyết định học tập, lựa chọn nguyện vọng thi cử hoặc kết quả tuyển sinh cuối cùng của người dùng.
                       </p>
                     </div>
                   </>
@@ -596,13 +596,13 @@ export default function Home() {
                     <div>
                       <h4 className="font-black text-lg text-black uppercase mb-1">1. Dữ liệu thu thập</h4>
                       <p className="text-black/85">
-                        Chúng tôi chỉ thu thập các dữ liệu cần thiết phục vụ cho việc tính toán định hướng, bao gồm: Họ tên, tên đăng nhập, điểm số học tập từng môn học, nguyện vọng trường học mục tiêu, kết quả trắc nghiệm tính cách Holland và các đoạn hội thoại trao đổi với trợ lý ảo Smarm AI.
+                        Chúng tôi chỉ thu thập các dữ liệu cần thiết phục vụ cho việc tính toán định hướng, bao gồm: Họ tên, tên đăng nhập, điểm số học tập từng môn học, nguyện vọng trường học mục tiêu, kết quả trắc nghiệm tính cách Holland và các đoạn hội thoại trao đổi với trợ lý ảo Astra AI.
                       </p>
                     </div>
                     <div>
                       <h4 className="font-black text-lg text-black uppercase mb-1">2. Mục đích sử dụng</h4>
                       <p className="text-black/85">
-                        Dữ liệu của bạn được sử dụng duy nhất nhằm mục đích cá nhân hóa: hiển thị biểu đồ học tập, ước lượng xác suất đỗ ngành học và cung cấp phản hồi thông minh/đúng ngữ cảnh của Smarm AI. Chúng tôi cam kết tuyệt đối không bán, chia sẻ hoặc cung cấp thông tin của bạn cho bất kỳ bên thứ ba nào vì mục đích quảng cáo hoặc mục đích thương mại khác.
+                        Dữ liệu của bạn được sử dụng duy nhất nhằm mục đích cá nhân hóa: hiển thị biểu đồ học tập, ước lượng xác suất đỗ ngành học và cung cấp phản hồi thông minh/đúng ngữ cảnh của Astra AI. Chúng tôi cam kết tuyệt đối không bán, chia sẻ hoặc cung cấp thông tin của bạn cho bất kỳ bên thứ ba nào vì mục đích quảng cáo hoặc mục đích thương mại khác.
                       </p>
                     </div>
                     <div>

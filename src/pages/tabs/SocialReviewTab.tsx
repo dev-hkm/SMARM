@@ -110,7 +110,7 @@ export default function SocialReviewTab() {
         ${searchContext}`;
         systemInstruction = "Chỉ tổng hợp góc nhìn mạng xã hội trực tiếp, dùng Markdown.";
       } else {
-        setApiWorkerStatus("Đang tổng hợp nhận xét từ cơ sở dữ liệu tri thức của Smarm AI...");
+        setApiWorkerStatus("Đang tổng hợp nhận xét từ cơ sở dữ liệu tri thức của Astra AI...");
         prompt = `Bạn là một chuyên gia hướng nghiệp và phân tích truyền thông giáo dục tại Việt Nam. Hãy tổng hợp "Góc nhìn Chân thật" và khách quan về trường "${uniTitle}" dựa trên những phản hồi, đánh giá và review phổ biến từ các thế hệ sinh viên trên các diễn đàn (như Facebook Groups, Confessions, Reddit).
 
         YÊU CẦU:

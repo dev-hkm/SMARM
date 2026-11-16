@@ -436,7 +436,7 @@ export default function LearningTab() {
       const primaryAspiration = aspirations[selectedAspirationIndex];
       const targetScore = primaryAspiration?.targetScore || 0;
 
-      let prompt = `Chào bạn, tôi là Smarm AI. Hãy phân tích tình hình học tập của người dùng ${userData.name || ""} dựa trên dữ liệu sau:
+      let prompt = `Chào bạn, tôi là Astra AI. Hãy phân tích tình hình học tập của người dùng ${userData.name || ""} dựa trên dữ liệu sau:
 - Kỳ học mới nhất có dữ liệu: ${analysisPeriod}
 - Điểm trung bình học kỳ: ${analysisAvg || "Chưa có"}
 - Điểm trung bình cả năm (ước tính): ${analysisYearly || "Chưa có"}
@@ -471,7 +471,7 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
 
       const response = await api.deepseekChat(
         [
-          { role: "system", content: "Bạn là trợ lý học tập Smarm AI." },
+          { role: "system", content: "Bạn là trợ lý học tập Astra AI." },
           { role: "user", content: prompt },
         ],
         undefined,
@@ -1117,7 +1117,7 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
           </div>
         {/* Left column end (removed) */}
 
-        {/* Smarm AI Analysis Section */}
+        {/* Astra AI Analysis Section */}
             <div className="brutal-card bg-green-pop p-6 md:p-8">
               <div className="relative z-10">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
@@ -1125,7 +1125,7 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
                     <div className="w-12 h-12 bg-white border-[3px] border-black flex items-center justify-center mr-4 shadow-[4px_4px_0_#000] flex-shrink-0">
                       <Sparkles className="w-6 h-6 text-black stroke-[3px]" />
                     </div>
-                    Smarm AI
+                    Astra AI
                   </h2>
                   <button
                     onClick={generateAIAnalysis}

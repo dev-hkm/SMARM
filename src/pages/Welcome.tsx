@@ -73,7 +73,7 @@ export default function Welcome() {
         </h1>
         
         <p className="text-lg text-black font-bold mb-10 leading-relaxed">
-          Chào mừng bạn đến với Smarm AI. Bạn đã sẵn sàng để khám phá bản thân và tìm ra con đường sự nghiệp phù hợp nhất với mình chưa?
+          Chào mừng bạn đến với Astra AI. Bạn đã sẵn sàng để khám phá bản thân và tìm ra con đường sự nghiệp phù hợp nhất với mình chưa?
         </p>
 
         <button

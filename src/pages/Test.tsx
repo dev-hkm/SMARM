@@ -296,7 +296,7 @@ export default function Test() {
               onClick={handleDevClick}
               style={{ textShadow: '2px 2px 0 var(--color-yellow-pop)' }}
             >
-              Smarm Test
+              Astra Test
               <span className="test-sparkle ml-2 inline-flex">
                 <Sparkles className="w-5 h-5 stroke-[3px]" />
               </span>

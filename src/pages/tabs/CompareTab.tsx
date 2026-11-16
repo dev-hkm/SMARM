@@ -119,7 +119,7 @@ export default function CompareTab() {
         // Calculate Holland Code from answers if possible
         const scores: Record<string, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
         // We'll import questions dynamically or count directly if we can't find question mapping
-        // In SMARM, Holland test answers map question IDs directly.
+        // In ASTRA, Holland test answers map question IDs directly.
         // Let's fallback to calculating top 3 if answers are available
         // Wait, does result tab save a hollandCode already? Let's check settings tab or results storage.
         // If we can't easily parse answers here, we'll try to find if there is 'smarm_guidance_results'
@@ -394,7 +394,7 @@ Trả về CHỈ một đối tượng JSON có dạng như sau, KHÔNG thêm b�
       setLoadingStep("synthesizing");
       setApiWorkerStatus("Đang tổng hợp dữ liệu và lập báo cáo so sánh...");
 
-      const systemInstruction = `Bạn là Smarm AI - Chuyên gia tư vấn tuyển sinh và hướng nghiệp hàng đầu tại Việt Nam.
+      const systemInstruction = `Bạn là Astra AI - Chuyên gia tư vấn tuyển sinh và hướng nghiệp hàng đầu tại Việt Nam.
 Nhiệm vụ của bạn là lập báo cáo so sánh chi tiết, chuyên sâu và trau chuốt nhất giữa hai trường đại học dựa trên thông tin tìm kiếm thực tế từ internet (Exa Search) và thông tin cá nhân của học sinh (điểm học tập, bài test Holland).
 
 YÊU CẦU QUAN TRỌNG VỀ ĐỘ CHI TIẾT:
@@ -744,7 +744,7 @@ Tính toán Fit score tổng thể trên thang điểm 1-100% dựa trên năng 
             </div>
 
             <div className="space-y-4 max-w-md bg-white border-[4px] border-black p-6 shadow-[6px_6px_0_#000]">
-              <h3 className="text-2xl font-black text-black uppercase tracking-tight">Smarm AI đang xử lý</h3>
+              <h3 className="text-2xl font-black text-black uppercase tracking-tight">Astra AI đang xử lý</h3>
               <p className="text-sm text-black font-bold bg-pink-pop px-3 py-2 border-[2px] border-black inline-block shadow-[2px_2px_0_#000]">
                 {apiWorkerStatus}
               </p>
@@ -817,7 +817,7 @@ Tính toán Fit score tổng thể trên thang điểm 1-100% dựa trên năng 
                 {isLoading && (
                   <div className="flex items-center gap-2 px-4 py-2 bg-pink-pop text-black text-sm font-black tracking-widest uppercase self-start w-fit border-[3px] border-black shadow-[4px_4px_0_#000] animate-pulse">
                     <Sparkles className="w-5 h-5 text-black stroke-[3px]" />
-                    <span>Smarm đang viết báo cáo...</span>
+                    <span>Astra đang viết báo cáo...</span>
                   </div>
                 )}
 

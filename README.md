@@ -1,12 +1,12 @@
 <div align="center">
 
-# SMARM
+# ASTRA
 
 **Nền tảng định hướng nghề nghiệp và tuyển sinh dành cho học sinh Việt Nam**
 
 Từ một bài trắc nghiệm tính cách đến một kế hoạch học tập cụ thể — tất cả trong cùng một ứng dụng.
 
-[![Bản chạy thực tế](https://img.shields.io/badge/Xem%20b%E1%BA%A3n%20ch%E1%BA%A1y%20th%E1%BB%B1c%20t%E1%BA%BF-smarm.pages.dev-FFA048?style=for-the-badge&labelColor=000000)](https://smarm.pages.dev)
+[![Bản chạy thực tế](https://img.shields.io/badge/Xem%20b%E1%BA%A3n%20ch%E1%BA%A1y%20th%E1%BB%B1c%20t%E1%BA%BF-astra-vn.pages.dev-FFA048?style=for-the-badge&labelColor=000000)](https://astra-vn.pages.dev)
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white)
@@ -23,7 +23,7 @@ Từ một bài trắc nghiệm tính cách đến một kế hoạch học tậ
 
 Mỗi năm, hàng trăm nghìn học sinh lớp 12 phải tự trả lời ba câu hỏi lớn: **mình hợp với nghề gì, nên học trường nào, và cần chuẩn bị những gì**. Thông tin thì nằm rải rác ở hàng chục website, phần lớn đã cũ, thiếu nguồn, hoặc chỉ đưa ra lời khuyên chung chung.
 
-SMARM gom toàn bộ quá trình đó vào một luồng duy nhất:
+ASTRA gom toàn bộ quá trình đó vào một luồng duy nhất:
 
 1. Làm bài trắc nghiệm Holland 60 câu để hiểu tính cách và nhóm nghề phù hợp.
 2. Nhận danh sách nghề được xếp theo mức độ phù hợp, không đảo lộn mỗi lần tải lại.
@@ -34,7 +34,7 @@ SMARM gom toàn bộ quá trình đó vào một luồng duy nhất:
 
 Toàn bộ dữ liệu học sinh được lưu theo tài khoản, nên lần sau đăng nhập lại vẫn còn nguyên.
 
-**Bản đang chạy:** https://smarm.pages.dev
+**Bản đang chạy:** https://astra-vn.pages.dev
 
 ---
 
@@ -47,7 +47,7 @@ Toàn bộ dữ liệu học sinh được lưu theo tài khoản, nên lần sa
 | **Lộ trình** | Đếm ngược kỳ thi · thời gian biểu theo thứ · danh sách việc cần làm |
 | **Góc nhìn** | Tổng hợp đánh giá, trải nghiệm thực tế của sinh viên về từng trường |
 | **So sánh** | So sánh song song các trường đã lưu theo học phí, điểm chuẩn, phương thức xét tuyển, cơ hội việc làm |
-| **Smarm AI** | Trợ lý hội thoại streaming, trả lời có ngữ cảnh hồ sơ, hỗ trợ công thức toán bằng KaTeX, giới hạn 12 lượt mỗi ngày |
+| **Astra AI** | Trợ lý hội thoại streaming, trả lời có ngữ cảnh hồ sơ, hỗ trợ công thức toán bằng KaTeX, giới hạn 12 lượt mỗi ngày |
 | **Cài đặt** | Xem lại kết quả Holland · làm lại bài test · đăng xuất |
 
 Ngoài ra:
@@ -98,7 +98,7 @@ Frontend và backend chạy chung một dự án Cloudflare Pages: phần giao d
 ## Cấu trúc thư mục
 
 ```text
-SMARM/
+ASTRA/
 ├── functions/              # Cloudflare Pages Functions (API)
 │   ├── api/
 │   │   ├── ai/chat.ts      # Hội thoại AI, streaming SSE
@@ -136,8 +136,8 @@ SMARM/
 ### 2. Cài đặt
 
 ```bash
-git clone https://github.com/dev-hkm/SMARM.git
-cd SMARM
+git clone https://github.com/dev-hkm/ASTRA.git
+cd ASTRA
 npm install
 ```
 

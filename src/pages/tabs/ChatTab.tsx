@@ -339,7 +339,7 @@ const ChatInput = memo(({
               e.currentTarget.style.height = 'auto';
             }
           }}
-          placeholder="Hỏi Smarm AI..."
+          placeholder="Hỏi Astra AI..."
           className="flex-1 bg-transparent px-3 py-3 text-black placeholder:text-black/40 focus:outline-none text-base md:text-lg font-bold resize-none min-h-[48px] max-h-[120px] custom-scrollbar"
           disabled={isLoading}
           rows={1}
@@ -630,7 +630,7 @@ export default function ChatTab({ onBack }: ChatTabProps) {
         })
         .join("; ");
 
-      let systemInstruction = `Bạn là Smarm, một trợ lý AI hướng nghiệp và học tập thông minh. Tên người dùng là ${userData.name || "bạn"}.
+      let systemInstruction = `Bạn là Astra, một trợ lý AI hướng nghiệp và học tập thông minh. Tên người dùng là ${userData.name || "bạn"}.
 
 Dữ liệu học tập hiện tại của người dùng:
 - Các môn học: ${subjects.join(", ")}
@@ -795,7 +795,7 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
               </div>
               <div className="text-left">
                 <h1 className="text-sm md:text-lg font-black text-black tracking-tight uppercase leading-none">
-                  Smarm AI
+                  Astra AI
                 </h1>
                 <div className="flex items-center gap-1 mt-0.5">
                   <span className="w-1.5 h-1.5 bg-green-pop rounded-full border border-black animate-pulse"></span>
@@ -879,7 +879,7 @@ PHONG CÁCH PHẢN HỒI (Rất quan trọng):
                           )}
                         </span>
                         <div className="text-[10px] sm:text-xs font-black text-black uppercase tracking-widest px-2 bg-white border-[2px] border-black inline-block shadow-[2px_2px_0_#000]">
-                          {msg.role === "user" ? "Bạn" : "Smarm AI"}
+                          {msg.role === "user" ? "Bạn" : "Astra AI"}
                         </div>
                       </div>
                       {msg.role === "user" ? (

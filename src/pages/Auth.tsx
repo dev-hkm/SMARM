@@ -137,7 +137,7 @@ export default function Auth() {
         className="brutal-card bg-white p-8 md:p-10 w-full max-w-md"
       >
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-black text-black mb-2 uppercase tracking-tighter" style={{ textShadow: "4px 4px 0 var(--color-yellow-pop)" }}>Smarm</h1>
+          <h1 className="text-4xl md:text-5xl font-black text-black mb-2 uppercase tracking-tighter" style={{ textShadow: "4px 4px 0 var(--color-yellow-pop)" }}>Astra</h1>
           <p className="text-xs font-black text-black uppercase tracking-widest mb-6 border-b-[3px] border-black pb-4 inline-block">Nền Tảng Theo Dõi &amp; Định Hướng</p>
           <p className="text-black font-bold uppercase">
             {isLogin ? 'Đăng nhập để tiếp tục' : 'Tạo tài khoản mới'}

@@ -122,7 +122,7 @@ export default function Dashboard() {
     { id: 'planner', label: 'Lộ trình', icon: Calendar },
     { id: 'social', label: 'Góc nhìn', icon: Globe },
     { id: 'compare', label: 'So sánh', icon: GitCompare },
-    { id: 'chat', label: 'Smarm AI', icon: MessageSquare },
+    { id: 'chat', label: 'Astra AI', icon: MessageSquare },
     { id: 'settings', label: 'Cài đặt', icon: Settings },
   ];
 
